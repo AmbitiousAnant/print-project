@@ -15,7 +15,7 @@ function App() {
               <div className="bg-white text-zinc-950 p-1.5 rounded-lg">
                 <Printer size={20} className="stroke-[2.5]" />
               </div>
-              <span className="font-semibold text-lg tracking-tight">Print Studio ABES</span>
+              <span className="font-semibold text-lg tracking-tight">Print Studio ABESEC</span>
             </Link>
             <div className="flex items-center gap-6">
               <Link to="/track" className="text-sm text-zinc-400 hover:text-white transition-colors font-medium">
