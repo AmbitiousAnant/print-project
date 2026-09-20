@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import OrderForm from './OrderForm'
 import AdminDashboard from './AdminDashboard'
+import OrderTracking from './OrderTracking'
 import { Printer } from 'lucide-react'
 
 function App() {
@@ -16,7 +17,10 @@ function App() {
               </div>
               <span className="font-semibold text-lg tracking-tight">Print Studio ABES</span>
             </Link>
-            <div className="flex gap-4">
+            <div className="flex items-center gap-6">
+              <Link to="/track" className="text-sm text-zinc-400 hover:text-white transition-colors font-medium">
+                Track Order
+              </Link>
               <Link to="/admin" className="text-sm text-zinc-400 hover:text-white transition-colors font-medium">
                 Admin
               </Link>
@@ -27,6 +31,7 @@ function App() {
         <main className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
           <Routes>
             <Route path="/" element={<OrderForm />} />
+            <Route path="/track" element={<OrderTracking />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </main>
