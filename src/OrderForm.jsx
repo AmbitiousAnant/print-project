@@ -35,11 +35,16 @@ export default function OrderForm() {
       const p = parseInt(formData.pages) || 0;
       if (p < 20) return 0; // Invalid, handled on submit
       
-      let base = formData.print_type === 'Color' ? 50 : 25;
-      let extra = formData.print_type === 'Color' ? 3 : 1.5;
+      if (formData.print_type === 'Color') {
+        price = p * 10;
+      } else {
+        price = 25 + ((p - 20) * 1.5);
+      }
       
-      const extraPages = p - 20;
-      price = base + (extraPages * extra);
+      if (formData.sides === 'Double-Sided') {
+        price += 10;
+      }
+      
       price = price * (parseInt(formData.copies) || 1);
     } else if (itemType === 'Register') {
       const base = formData.register_type.includes('Fair') ? 60 : 50;
@@ -48,7 +53,7 @@ export default function OrderForm() {
       price = 500 * (parseInt(formData.quantity) || 1);
     }
     return price;
-  }, [itemType, formData.pages, formData.print_type, formData.copies, formData.register_type, formData.quantity]);
+  }, [itemType, formData.pages, formData.print_type, formData.sides, formData.copies, formData.register_type, formData.quantity]);
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -182,7 +187,7 @@ export default function OrderForm() {
             </div>
             
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-zinc-300">Roll Number</label>
+              <label className="text-sm font-medium text-zinc-300">Roll Number/Admission Number</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FileText className="h-4 w-4 text-zinc-500" />
