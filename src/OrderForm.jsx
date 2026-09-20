@@ -228,4 +228,187 @@ export default function OrderForm() {
                   Document Link
                   <span className="text-zinc-500 text-xs font-normal">Must be "Anyone with link"</span>
                 </label>
-                <div className=
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <LinkIcon className="h-4 w-4 text-zinc-500" />
+                  </div>
+                  <input
+                    required
+                    type="url"
+                    name="document_url"
+                    value={formData.document_url}
+                    onChange={handleChange}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all placeholder:text-zinc-600"
+                    placeholder="https://drive.google.com/file/d/..."
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-zinc-300">Color Type</label>
+                  <div className="flex bg-zinc-950 rounded-xl border border-zinc-800 p-1">
+                    {['Black & White', 'Color'].map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, print_type: type }))}
+                        className={`flex-1 text-xs py-2 rounded-lg font-medium transition-all ${
+                          formData.print_type === type
+                            ? 'bg-white text-zinc-950 shadow-sm'
+                            : 'text-zinc-400 hover:text-zinc-200'
+                        }`}
+                      >
+                        {type === 'Black & White' ? 'B&W' : 'Color'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-zinc-300">Sides</label>
+                  <div className="flex bg-zinc-950 rounded-xl border border-zinc-800 p-1">
+                    {['Single-Sided', 'Double-Sided'].map((side) => (
+                      <button
+                        key={side}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, sides: side }))}
+                        className={`flex-1 text-xs py-2 rounded-lg font-medium transition-all ${
+                          formData.sides === side
+                            ? 'bg-white text-zinc-950 shadow-sm'
+                            : 'text-zinc-400 hover:text-zinc-200'
+                        }`}
+                      >
+                        {side.split('-')[0]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-5 pt-2">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-zinc-300">Total Pages (in PDF)</label>
+                  <input
+                    required
+                    type="number"
+                    min="20"
+                    name="pages"
+                    value={formData.pages}
+                    onChange={handleChange}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
+                  />
+                  {parseInt(formData.pages) < 20 && (
+                    <p className="text-red-400 text-xs mt-1">Minimum 20 pages required.</p>
+                  )}
+                </div>
+                
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-zinc-300">Number of Copies</label>
+                  <input
+                    required
+                    type="number"
+                    min="1"
+                    name="copies"
+                    value={formData.copies}
+                    onChange={handleChange}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* REGISTER SECTION */}
+          {itemType === 'Register' && (
+            <div className="space-y-5 p-5 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
+              <div className="space-y-1.5">
+                <h3 className="text-white font-medium mb-2 border-b border-zinc-800 pb-2">Register Details</h3>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-zinc-300">Select Register</label>
+                <select
+                  name="register_type"
+                  value={formData.register_type}
+                  onChange={handleChange}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all text-white appearance-none"
+                >
+                  <option value="Rough Register (~200 pages)">Rough Register (~200 pages) - ₹50</option>
+                  <option value="Fair Register (~200 pages)">Fair Register (~200 pages) - ₹60</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-zinc-300">Quantity</label>
+                <input
+                  required
+                  type="number"
+                  min="1"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* CALCULATOR SECTION */}
+          {itemType === 'Calculator' && (
+            <div className="space-y-5 p-5 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
+              <div className="space-y-1.5">
+                <h3 className="text-white font-medium mb-2 border-b border-zinc-800 pb-2">Calculator Details</h3>
+              </div>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-white">Scientific Calculator</h4>
+                  <p className="text-sm text-zinc-400">Standard engineering model</p>
+                </div>
+                <span className="font-semibold text-lg text-white">₹500</span>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-zinc-300">Quantity</label>
+                <input
+                  required
+                  type="number"
+                  min="1"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* PRICE SUMMARY */}
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-zinc-400">Estimated Total</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Pay upon pickup</p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold text-white">
+                ₹{calculatedPrice}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading || (itemType === 'Print' && parseInt(formData.pages) < 20)}
+            className="w-full bg-white hover:bg-zinc-200 text-zinc-950 font-bold py-4 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg shadow-lg"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              `Place Order • ₹${calculatedPrice}`
+            )}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}

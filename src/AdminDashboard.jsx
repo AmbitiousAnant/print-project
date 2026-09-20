@@ -221,4 +221,68 @@ export default function AdminDashboard() {
                     </span>
                   </div>
                   <div className="text-lg font-bold text-white bg-zinc-950 px-3 py-1 rounded-lg border border-zinc-800">
-                    ₹{order.total_price
+                    ₹{order.total_price}
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-zinc-400">
+                  <div className="flex items-center gap-1.5 font-medium text-zinc-300 bg-zinc-800/50 px-2.5 py-1 rounded-md">
+                    {getItemIcon(order.item_type)}
+                    {order.item_type}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-medium text-zinc-300">Details:</span> {order.item_details}
+                    {order.item_type === 'Print' && ` • ${order.print_type} • ${order.sides}`}
+                    {` • Qty: ${order.copies}`}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4" />
+                    {new Date(order.created_at).toLocaleDateString()} {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-zinc-300">
+                    <a 
+                      href={`https://wa.me/${order.whatsapp_number.replace(/\D/g,'')}`}
+                      target="_blank" rel="noreferrer"
+                      className="hover:text-white hover:underline transition-all"
+                    >
+                      WhatsApp: {order.whatsapp_number}
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 border-t lg:border-t-0 lg:border-l border-zinc-800 pt-4 lg:pt-0 lg:pl-6">
+                {order.item_type === 'Print' && order.document_url && (
+                  <a
+                    href={order.document_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 hover:bg-blue-400/20 px-3 py-2 rounded-lg"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Doc
+                  </a>
+                )}
+
+                <div className="flex items-center bg-zinc-950 rounded-lg border border-zinc-800 overflow-hidden pr-2">
+                  <select
+                    value={order.status}
+                    onChange={(e) => updateStatus(order.id, e.target.value)}
+                    className={`text-sm font-medium outline-none px-3 py-2.5 appearance-none bg-transparent cursor-pointer ${getStatusColor(order.status)}`}
+                  >
+                    <option value="Pending" className="text-zinc-900">Pending</option>
+                    <option value="Accepted" className="text-zinc-900">Accepted</option>
+                    <option value="Printed" className="text-zinc-900">Printed</option>
+                    <option value="Completed" className="text-zinc-900">Completed</option>
+                    <option value="Rejected" className="text-zinc-900">Rejected</option>
+                  </select>
+                </div>
+              </div>
+
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
