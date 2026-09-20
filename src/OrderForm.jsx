@@ -16,7 +16,8 @@ export default function OrderForm() {
     pages: 20,
     copies: 1,
     // Stationery fields
-    register_type: 'Rough Register (~200 pages)',
+    register_type: 'Spiral (~400 pages) - ₹180',
+    calculator_type: '100MS - ₹1000',
     quantity: 1
   })
   
@@ -47,13 +48,19 @@ export default function OrderForm() {
       
       price = price * (parseInt(formData.copies) || 1);
     } else if (itemType === 'Register') {
-      const base = formData.register_type.includes('Fair') ? 60 : 50;
+      let base = 180;
+      if (formData.register_type.includes('₹70')) base = 70;
+      else if (formData.register_type.includes('₹60')) base = 60;
+      else if (formData.register_type.includes('₹50')) base = 50;
+      else if (formData.register_type.includes('₹30')) base = 30;
+      else if (formData.register_type.includes('₹20')) base = 20;
       price = base * (parseInt(formData.quantity) || 1);
     } else if (itemType === 'Calculator') {
-      price = 500 * (parseInt(formData.quantity) || 1);
+      let base = formData.calculator_type.includes('991ES') ? 1250 : 1000;
+      price = base * (parseInt(formData.quantity) || 1);
     }
     return price;
-  }, [itemType, formData.pages, formData.print_type, formData.sides, formData.copies, formData.register_type, formData.quantity]);
+  }, [itemType, formData.pages, formData.print_type, formData.sides, formData.copies, formData.register_type, formData.calculator_type, formData.quantity]);
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -83,7 +90,7 @@ export default function OrderForm() {
         orderData.item_details = formData.register_type
         orderData.copies = parseInt(formData.quantity) // using copies column to store quantity
       } else if (itemType === 'Calculator') {
-        orderData.item_details = 'Scientific Calculator'
+        orderData.item_details = formData.calculator_type
         orderData.copies = parseInt(formData.quantity)
       }
 
@@ -292,7 +299,10 @@ export default function OrderForm() {
 
                 <div className="grid grid-cols-2 gap-5 pt-2">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-zinc-300">Total Pages (in PDF)</label>
+                    <label className="text-sm font-medium text-zinc-300 flex flex-col gap-0.5">
+                      <span>Total Pages (in PDF)</span>
+                      <span className="text-zinc-500 text-xs font-normal">Only 20+ pages are allowed</span>
+                    </label>
                     <input required type="number" min="20" name="pages" value={formData.pages} onChange={handleChange} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all" />
                     {parseInt(formData.pages) < 20 && (
                       <p className="text-red-400 text-xs mt-1">Minimum 20 pages required.</p>
@@ -316,8 +326,12 @@ export default function OrderForm() {
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-zinc-300">Select Register</label>
                   <select name="register_type" value={formData.register_type} onChange={handleChange} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all text-white appearance-none">
-                    <option value="Rough Register (~200 pages)">Rough Register (~200 pages) - ₹50</option>
-                    <option value="Fair Register (~200 pages)">Fair Register (~200 pages) - ₹60</option>
+                    <option value="Spiral (~400 pages) - ₹180">Spiral (~400 pages) - ₹180</option>
+                    <option value="Register (~200 pages) - ₹70">Register (~200 pages) - ₹70</option>
+                    <option value="Register (~200 pages) - ₹60">Register (~200 pages) - ₹60</option>
+                    <option value="Yellow Pages Register (~200 pages) - ₹50">Yellow Pages Register (~200 pages) - ₹50</option>
+                    <option value="Copy - ₹30">Copy - ₹30</option>
+                    <option value="Copy - ₹20">Copy - ₹20</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
@@ -333,12 +347,12 @@ export default function OrderForm() {
                 <div className="space-y-1.5">
                   <h3 className="text-white font-medium mb-2 border-b border-zinc-800 pb-2">Calculator Details</h3>
                 </div>
-                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-white">Scientific Calculator</h4>
-                    <p className="text-sm text-zinc-400">Standard engineering model</p>
-                  </div>
-                  <span className="font-semibold text-lg text-white">₹500</span>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-zinc-300">Select Calculator</label>
+                  <select name="calculator_type" value={formData.calculator_type} onChange={handleChange} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all text-white appearance-none">
+                    <option value="100MS - ₹1000">100MS - ₹1000</option>
+                    <option value="991ES - ₹1250">991ES - ₹1250</option>
+                  </select>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-zinc-300">Quantity</label>
