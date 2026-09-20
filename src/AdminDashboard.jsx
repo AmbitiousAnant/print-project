@@ -215,6 +215,7 @@ export default function AdminDashboard() {
               <div className="flex-1 space-y-3">
                 <div className="flex items-start justify-between sm:items-center">
                   <div className="flex items-center gap-3">
+                    <span className="text-zinc-500 font-mono font-medium text-lg">#{orders.length - orders.findIndex(o => o.id === order.id)}</span>
                     <h3 className="font-semibold text-white text-lg">{order.student_name}</h3>
                     <span className="text-xs font-mono bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-md">
                       {order.roll_number}

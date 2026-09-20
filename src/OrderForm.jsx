@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { supabase } from './supabaseClient'
-import { CheckCircle2, Loader2, Link as LinkIcon, FileText, User, Phone, Package, Printer, BookOpen, Calculator, Home, Wallet, Zap, MessageCircle } from 'lucide-react'
+import { CheckCircle2, Loader2, Link as LinkIcon, FileText, User, Phone, Package, Printer, BookOpen, Calculator, Home, Wallet, Zap, MessageCircle, Users } from 'lucide-react'
 
 export default function OrderForm() {
   const [itemType, setItemType] = useState('Print') // 'Print', 'Register', 'Calculator'
@@ -12,7 +12,7 @@ export default function OrderForm() {
     // Print fields
     document_url: '',
     print_type: 'Black & White',
-    sides: 'Double-Sided',
+    sides: 'Single-Sided',
     pages: 20,
     copies: 1,
     // Stationery fields
@@ -375,6 +375,21 @@ export default function OrderForm() {
               )}
             </button>
           </form>
+        </div>
+      </div>
+      {/* OUR INITIATIVE SECTION */}
+      <div className="max-w-4xl mx-auto px-4 pb-4">
+        <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-3xl p-8 sm:p-12 text-center space-y-6">
+          <div className="inline-flex items-center justify-center p-3 bg-zinc-800/50 rounded-2xl mb-2">
+            <Users className="w-6 h-6 text-zinc-300" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">A Student-Led Initiative</h2>
+          <p className="text-zinc-400 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
+            Print Studio ABESEC is a self-funded, independent initiative started by <strong className="text-zinc-200">Anant Thakkur</strong> and <strong className="text-zinc-200">Sribendu Prasad Muduli</strong>. We built this to solve a problem we faced every day: the hassle of overpriced, slow, and inconvenient printing. We are dedicated to providing our fellow engineering students with a seamless, affordable alternative.
+          </p>
+          <p className="text-zinc-500 italic text-sm mt-6">
+            🤫 Legend says if the faculty finds out about these prices, the matrix will collapse. Let's keep this our little secret.
+          </p>
         </div>
       </div>
 
