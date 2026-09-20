@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import OrderForm from './OrderForm'
 import AdminDashboard from './AdminDashboard'
 import OrderTracking from './OrderTracking'
-import { Printer } from 'lucide-react'
+import { Printer, MessageCircle, Linkedin } from 'lucide-react'
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
           </div>
         </nav>
         
-        <main className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+        <main className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
             <Route path="/" element={<OrderForm />} />
             <Route path="/track" element={<OrderTracking />} />
@@ -36,13 +36,45 @@ function App() {
           </Routes>
         </main>
 
-        <footer className="border-t border-zinc-800 bg-zinc-950/90 backdrop-blur-md py-4 text-center text-sm text-zinc-400 fixed bottom-0 w-full z-40">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-6">
-            <span>Built by <strong>Anant Thakkur</strong></span>
-            <span className="hidden sm:inline text-zinc-700">•</span>
-            <span>WhatsApp: <a href="https://wa.me/917982350793" target="_blank" rel="noreferrer" className="text-white hover:underline">7982350793</a></span>
-            <span className="hidden sm:inline text-zinc-700">•</span>
-            <a href="https://www.linkedin.com/in/anant-thakkur-4b970437a/" target="_blank" rel="noreferrer" className="text-white hover:underline">LinkedIn</a>
+        <footer className="border-t border-zinc-800 bg-zinc-950 py-10 text-sm text-zinc-400 w-full mt-auto">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              {/* Founder 1 */}
+              <div className="flex flex-col items-center md:items-start space-y-2">
+                <span className="text-white font-semibold text-base">Anant Thakkur</span>
+                <span className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">Developer & Co-Founder</span>
+                <div className="flex items-center gap-4 pt-2">
+                  <a href="https://wa.me/917982350793" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>7982350793</span>
+                  </a>
+                  <a href="https://www.linkedin.com/in/anant-thakkur-4b970437a/" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
+                    <Linkedin className="w-4 h-4" />
+                    <span>LinkedIn</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Founder 2 */}
+              <div className="flex flex-col items-center md:items-end space-y-2">
+                <span className="text-white font-semibold text-base">Sribendu Prasad Muduli</span>
+                <span className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">Business Partner</span>
+                <div className="flex items-center gap-4 pt-2">
+                  <a href="https://wa.me/918929470101" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>8929470101</span>
+                  </a>
+                  <a href="https://www.linkedin.com/in/sribendu-prasad-muduli-8bb4a3366/" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
+                    <Linkedin className="w-4 h-4" />
+                    <span>LinkedIn</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center pt-8 border-t border-zinc-900">
+              <p className="text-zinc-500 font-medium tracking-wide">Built for ABES Engineering College</p>
+            </div>
           </div>
         </footer>
       </div>
