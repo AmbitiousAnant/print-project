@@ -72,6 +72,18 @@ export default function OrderForm() {
         throw new Error("Minimum 20 pages required for print orders.");
       }
 
+      const { data: activeOrders, error: checkError } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('roll_number', formData.roll_number.trim())
+        .in('status', ['Pending', 'Accepted', 'Printed']);
+
+      if (checkError) throw checkError;
+
+      if (activeOrders && activeOrders.length > 0) {
+        throw new Error("Your previous order is still pending. You can only have one active order at a time.");
+      }
+
       const orderData = {
         student_name: formData.student_name,
         roll_number: formData.roll_number,
@@ -154,9 +166,9 @@ export default function OrderForm() {
           <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
             <Home className="w-6 h-6 text-white" />
           </div>
-          <h3 className="text-white font-semibold text-lg">Door-to-Door Convenience</h3>
+          <h3 className="text-white font-semibold text-lg">Hand-to-Hand Delivery</h3>
           <p className="text-zinc-400 text-sm leading-relaxed">
-            Place orders straight from your home or hostel bed. We hand-deliver your prints directly to you on campus.
+            Place orders from your hostel or home. We hand-deliver your prints directly to you on campus.
           </p>
         </div>
         <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 space-y-4 hover:border-zinc-700 transition-colors">
