@@ -253,7 +253,7 @@ export default function AdminDashboard() {
               </div>
 
               <div className="flex flex-wrap items-center gap-4 border-t lg:border-t-0 lg:border-l border-zinc-800 pt-4 lg:pt-0 lg:pl-6">
-                {order.item_type === 'Print' && order.document_url && (
+                {order.item_type === 'Print' && order.document_url && (order.document_url.startsWith('http://') || order.document_url.startsWith('https://')) && (
                   <a
                     href={order.document_url}
                     target="_blank"

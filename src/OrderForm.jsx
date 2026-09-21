@@ -13,7 +13,7 @@ export default function OrderForm() {
     document_url: '',
     print_type: 'Black & White',
     sides: 'Single-Sided',
-    pages: 20,
+    pages: 1,
     copies: 1,
     // Stationery fields
     register_type: 'Spiral (~400 pages) - ₹180',
@@ -135,7 +135,7 @@ export default function OrderForm() {
           <button
             onClick={() => {
               setSuccess(false);
-              setFormData(prev => ({ ...prev, document_url: '', pages: 20, copies: 1, quantity: 1 }));
+              setFormData(prev => ({ ...prev, document_url: '', pages: 1, copies: 1, quantity: 1 }));
             }}
             className="mt-6 w-full bg-zinc-800 hover:bg-zinc-700 text-white font-medium py-3 px-4 rounded-xl transition-colors"
           >
@@ -315,7 +315,7 @@ export default function OrderForm() {
                       <span>Total Pages (in PDF)</span>
                       <span className="text-zinc-500 text-xs font-normal">Only 20+ pages are allowed</span>
                     </label>
-                    <input required type="number" min="20" name="pages" value={formData.pages} onChange={handleChange} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all" />
+                    <input required type="number" min="1" name="pages" value={formData.pages} onChange={handleChange} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all" />
                     {parseInt(formData.pages) < 20 && (
                       <p className="text-red-400 text-xs mt-1">Minimum 20 pages required.</p>
                     )}
