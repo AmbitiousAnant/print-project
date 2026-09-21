@@ -4,6 +4,7 @@ import OrderForm from './OrderForm'
 import AdminDashboard from './AdminDashboard'
 import OrderTracking from './OrderTracking'
 import { Printer, MessageCircle, Linkedin } from 'lucide-react'
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   return (
@@ -77,6 +78,7 @@ function App() {
             </div>
           </div>
         </footer>
+        <Analytics />
       </div>
     </Router>
   )
