@@ -34,19 +34,20 @@ export default function OrderForm() {
     let price = 0;
     if (itemType === 'Print') {
       const p = parseInt(formData.pages) || 0;
-      if (p < 20) return 0; // Invalid, handled on submit
+      const c = parseInt(formData.copies) || 1;
+      const totalPages = p * c;
+      
+      if (totalPages < 20) return 0; // Invalid, handled on submit
       
       if (formData.print_type === 'Color') {
-        price = p * 10;
+        price = totalPages * 10;
       } else {
-        price = 25 + ((p - 20) * 1.5);
+        price = 25 + ((totalPages - 20) * 1.5);
       }
       
       if (formData.sides === 'Double-Sided') {
         price += 10;
       }
-      
-      price = price * (parseInt(formData.copies) || 1);
     } else if (itemType === 'Register') {
       let base = 180;
       if (formData.register_type.includes('₹70')) base = 70;
@@ -68,8 +69,11 @@ export default function OrderForm() {
     setError('')
     
     try {
-      if (itemType === 'Print' && parseInt(formData.pages) < 20) {
-        throw new Error("Minimum 20 pages required for print orders.");
+      const p = parseInt(formData.pages) || 0;
+      const c = parseInt(formData.copies) || 1;
+      
+      if (itemType === 'Print' && (p * c) < 20) {
+        throw new Error("Total combined pages (Pages × Copies) must be at least 20.");
       }
 
       const { data: activeOrders, error: checkError } = await supabase
@@ -313,11 +317,11 @@ export default function OrderForm() {
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-zinc-300 flex flex-col gap-0.5">
                       <span>Total Pages (in PDF)</span>
-                      <span className="text-zinc-500 text-xs font-normal">Only 20+ pages are allowed</span>
+                      <span className="text-zinc-500 text-xs font-normal">Min. 20 total printed pages</span>
                     </label>
                     <input required type="number" min="1" name="pages" value={formData.pages} onChange={handleChange} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all" />
-                    {parseInt(formData.pages) < 20 && (
-                      <p className="text-red-400 text-xs mt-1">Minimum 20 pages required.</p>
+                    {(parseInt(formData.pages) * parseInt(formData.copies)) < 20 && (
+                      <p className="text-red-400 text-xs mt-1">Total (Pages × Copies) must be 20+.</p>
                     )}
                   </div>
                   
@@ -388,7 +392,7 @@ export default function OrderForm() {
 
             <button
               type="submit"
-              disabled={loading || (itemType === 'Print' && parseInt(formData.pages) < 20)}
+              disabled={loading || (itemType === 'Print' && (parseInt(formData.pages) * parseInt(formData.copies)) < 20)}
               className="w-full bg-white hover:bg-zinc-200 text-zinc-950 font-bold py-4 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg shadow-lg"
             >
               {loading ? (
