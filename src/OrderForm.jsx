@@ -151,91 +151,99 @@ export default function OrderForm() {
   }
 
   return (
-    <div className="flex-1 w-full max-w-5xl mx-auto py-8 space-y-12">
-      
-      {/* HERO SECTION */}
-      <div className="text-center space-y-4 px-4 mt-4">
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+    <div className="flex-1 w-full pb-32">
+      {/* TOP VISUAL HEADER */}
+      <div className="text-center space-y-6 px-4 py-16 sm:py-24 bg-gradient-to-b from-zinc-900/50 to-zinc-950 border-b border-zinc-800">
+        <h1 className="text-5xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 tracking-tighter leading-tight max-w-4xl mx-auto">
           Skip the Line. Order from your Room.<br className="hidden sm:block" />
-          <span className="text-zinc-300">Get it in your Hand.</span>
+          <span className="text-white">Get it in your Hand.</span>
         </h1>
-        <p className="text-zinc-400 text-lg sm:text-xl max-w-2xl mx-auto">
+        <p className="text-zinc-400 text-lg sm:text-2xl max-w-2xl mx-auto font-medium">
           Print Studio ABESEC is the most affordable and convenient print & stationery provider on campus.
         </p>
       </div>
 
-      {/* FEATURES GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-4xl mx-auto">
-        <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 space-y-4 hover:border-zinc-700 transition-colors">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
-            <Home className="w-6 h-6 text-white" />
-          </div>
-          <h3 className="text-white font-semibold text-lg">Hand-to-Hand Delivery</h3>
-          <p className="text-zinc-400 text-sm leading-relaxed">
-            Place orders from your hostel or home. We hand-deliver your prints directly to you on campus.
-          </p>
+      <div className="max-w-6xl mx-auto px-4 mt-16 space-y-12">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">What do you need today?</h2>
+          <p className="text-zinc-400">Select a category below to configure your order.</p>
         </div>
-        <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 space-y-4 hover:border-zinc-700 transition-colors">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
-            <Wallet className="w-6 h-6 text-white" />
-          </div>
-          <h3 className="text-white font-semibold text-lg">Unbeatable Prices</h3>
-          <p className="text-zinc-400 text-sm leading-relaxed">
-            Why overpay at standard shops? Our prints, registers, and calculators are priced significantly lower than any other campus stationery.
-          </p>
-        </div>
-        <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 space-y-4 hover:border-zinc-700 transition-colors">
-          <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
-            <Zap className="w-6 h-6 text-white" />
-          </div>
-          <h3 className="text-white font-semibold text-lg">Premium Quality & Speed</h3>
-          <p className="text-zinc-400 text-sm leading-relaxed">
-            Crisp pages, perfectly bound, delivered fast so you never miss a submission deadline.
-          </p>
-        </div>
-      </div>
 
-      {/* FORM SECTION */}
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-zinc-900/80 border border-zinc-800/80 rounded-3xl p-6 sm:p-10 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
-          {/* subtle gradient glow behind the form */}
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-          
-          <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-white mb-2">Start Your Order</h2>
-            <p className="text-zinc-400 text-sm">Select what you need below and we'll handle the rest.</p>
-          </div>
-
-          {error && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center font-medium">
-              {error}
+        {/* PRODUCT SELECTION GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Print Card */}
+          <div 
+            onClick={() => { setItemType('Print'); setError(''); }}
+            className={`cursor-pointer group relative bg-zinc-900 border rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1 ${
+              itemType === 'Print' ? 'border-white ring-2 ring-white/50 shadow-[0_0_30px_rgba(255,255,255,0.1)]' : 'border-zinc-800 hover:border-zinc-700'
+            }`}
+          >
+            <div className="bg-zinc-800/30 p-6 flex items-center justify-center border-b border-zinc-800/50">
+              <img src="/print.jpg" alt="Document Printing" className="h-48 w-full object-contain opacity-60 group-hover:opacity-100 transition-opacity drop-shadow-2xl" />
             </div>
-          )}
-
-          <div className="flex gap-2 sm:gap-4 mb-8 bg-zinc-950 p-1 rounded-xl border border-zinc-800 overflow-x-auto">
-            {[
-              { id: 'Print', icon: Printer, label: 'Print Document' },
-              { id: 'Register', icon: BookOpen, label: 'Registers' },
-              { id: 'Calculator', icon: Calculator, label: 'Calculator' }
-            ].map(type => (
-              <button
-                key={type.id}
-                onClick={() => { setItemType(type.id); setError(''); }}
-                className={`flex-1 min-w-[100px] flex items-center justify-center gap-2 py-3 px-3 rounded-lg text-sm font-semibold transition-all ${
-                  itemType === type.id 
-                  ? 'bg-white text-zinc-950 shadow-md' 
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
-                }`}
-              >
-                <type.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{type.label}</span>
-                <span className="sm:hidden">{type.id}</span>
-              </button>
-            ))}
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-2 flex items-center justify-between">
+                Document Printing
+                {itemType === 'Print' && <CheckCircle2 className="w-5 h-5 text-white" />}
+              </h3>
+              <p className="text-zinc-400 text-sm mb-4">High-quality B&W or Color prints.</p>
+              <div className="inline-block bg-zinc-950 border border-zinc-800 px-3 py-1 rounded-lg text-sm text-white font-medium">Starting at ₹25</div>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-5 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
+          {/* Register Card */}
+          <div 
+            onClick={() => { setItemType('Register'); setError(''); }}
+            className={`cursor-pointer group relative bg-zinc-900 border rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1 ${
+              itemType === 'Register' ? 'border-white ring-2 ring-white/50 shadow-[0_0_30px_rgba(255,255,255,0.1)]' : 'border-zinc-800 hover:border-zinc-700'
+            }`}
+          >
+            <div className="bg-zinc-800/30 p-6 flex items-center justify-center border-b border-zinc-800/50">
+              <img src="/register.jpg" alt="College Registers" className="h-48 w-full object-contain opacity-60 group-hover:opacity-100 transition-opacity drop-shadow-2xl" />
+            </div>
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-2 flex items-center justify-between">
+                College Registers
+                {itemType === 'Register' && <CheckCircle2 className="w-5 h-5 text-white" />}
+              </h3>
+              <p className="text-zinc-400 text-sm mb-4">Rough, Fair, and Spiral notebooks.</p>
+              <div className="inline-block bg-zinc-950 border border-zinc-800 px-3 py-1 rounded-lg text-sm text-white font-medium">Starting at ₹50</div>
+            </div>
+          </div>
+
+          {/* Calculator Card */}
+          <div 
+            onClick={() => { setItemType('Calculator'); setError(''); }}
+            className={`cursor-pointer group relative bg-zinc-900 border rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1 ${
+              itemType === 'Calculator' ? 'border-white ring-2 ring-white/50 shadow-[0_0_30px_rgba(255,255,255,0.1)]' : 'border-zinc-800 hover:border-zinc-700'
+            }`}
+          >
+            <div className="bg-zinc-800/30 p-6 flex items-center justify-center border-b border-zinc-800/50">
+              <img src="/calculator.jpg" alt="Scientific Calculators" className="h-48 w-full object-contain opacity-60 group-hover:opacity-100 transition-opacity drop-shadow-2xl" />
+            </div>
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-2 flex items-center justify-between">
+                Calculators
+                {itemType === 'Calculator' && <CheckCircle2 className="w-5 h-5 text-white" />}
+              </h3>
+              <p className="text-zinc-400 text-sm mb-4">100MS and 991ES Engineering models.</p>
+              <div className="inline-block bg-zinc-950 border border-zinc-800 px-3 py-1 rounded-lg text-sm text-white font-medium">Starting at ₹1000</div>
+            </div>
+          </div>
+        </div>
+
+        {/* DYNAMIC CONFIGURATION SECTION */}
+        <form onSubmit={handleSubmit} className="relative mt-8">
+          <div className="bg-zinc-900/50 backdrop-blur-md border border-zinc-800/80 rounded-2xl p-6 shadow-2xl space-y-8 max-w-4xl mx-auto relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            
+            {error && (
+              <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center font-medium">
+                {error}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5 sm:col-span-2">
                 <h3 className="text-white font-medium mb-2 border-b border-zinc-800 pb-2">Personal Details</h3>
               </div>
@@ -270,9 +278,8 @@ export default function OrderForm() {
               </div>
             </div>
 
-            {/* PRINT SECTION */}
             {itemType === 'Print' && (
-              <div className="space-y-5 p-5 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
+              <div className="space-y-5 pt-4">
                  <div className="space-y-1.5">
                   <h3 className="text-white font-medium mb-2 border-b border-zinc-800 pb-2">Print Details</h3>
                 </div>
@@ -333,9 +340,8 @@ export default function OrderForm() {
               </div>
             )}
 
-            {/* REGISTER SECTION */}
             {itemType === 'Register' && (
-              <div className="space-y-5 p-5 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
+              <div className="space-y-5 pt-4">
                 <div className="space-y-1.5">
                   <h3 className="text-white font-medium mb-2 border-b border-zinc-800 pb-2">Register Details</h3>
                 </div>
@@ -357,9 +363,8 @@ export default function OrderForm() {
               </div>
             )}
 
-            {/* CALCULATOR SECTION */}
             {itemType === 'Calculator' && (
-              <div className="space-y-5 p-5 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
+              <div className="space-y-5 pt-4">
                 <div className="space-y-1.5">
                   <h3 className="text-white font-medium mb-2 border-b border-zinc-800 pb-2">Calculator Details</h3>
                 </div>
@@ -376,74 +381,68 @@ export default function OrderForm() {
                 </div>
               </div>
             )}
+          </div>
 
-            {/* PRICE SUMMARY */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex items-center justify-between">
+          {/* FLOATING CHECKOUT BAR */}
+          <div className="sticky bottom-0 w-full z-40 bg-zinc-950/90 backdrop-blur-xl border-t border-zinc-800 p-4 sm:p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+            <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <p className="text-sm text-zinc-400">Estimated Total</p>
-                <p className="text-xs text-zinc-500 mt-0.5">Pay upon pickup</p>
+                <p className="text-3xl font-black text-white">₹{calculatedPrice}</p>
               </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold text-white">
-                  ₹{calculatedPrice}
-                </p>
-              </div>
+              <button
+                type="submit"
+                disabled={loading || (itemType === 'Print' && (parseInt(formData.pages) * parseInt(formData.copies)) < 20)}
+                className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-zinc-950 font-bold py-4 px-8 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg shadow-lg"
+              >
+                {loading ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
+                ) : (
+                  'Confirm Request'
+                )}
+              </button>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading || (itemType === 'Print' && (parseInt(formData.pages) * parseInt(formData.copies)) < 20)}
-              className="w-full bg-white hover:bg-zinc-200 text-zinc-950 font-bold py-4 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg shadow-lg"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                `Place Order • ₹${calculatedPrice}`
-              )}
-            </button>
-          </form>
-        </div>
-      </div>
-      {/* OUR INITIATIVE SECTION */}
-      <div className="max-w-4xl mx-auto px-4 pb-4">
-        <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-3xl p-8 sm:p-12 text-center space-y-6">
-          <div className="inline-flex items-center justify-center p-3 bg-zinc-800/50 rounded-2xl mb-2">
-            <Users className="w-6 h-6 text-zinc-300" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">A Student-Led Initiative</h2>
-          <p className="text-zinc-400 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
-            Print Studio ABESEC is a self-funded, independent initiative started by <strong className="text-zinc-200">Anant Thakkur</strong> and <strong className="text-zinc-200">Sribendu Prasad Muduli</strong>. We built this to solve a problem we faced every day: the hassle of overpriced, slow, and inconvenient printing. We are dedicated to providing our fellow engineering students with a seamless, affordable alternative.
-          </p>
-          <p className="text-zinc-500 italic text-sm mt-6">
-            🤫 Legend says if the faculty finds out about these prices, the matrix will collapse. Let's keep this our little secret.
-          </p>
-        </div>
-      </div>
+        </form>
 
-      {/* CUSTOM BANNER */}
-      <div className="max-w-2xl mx-auto px-4 pb-8">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-xl">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zinc-500 to-transparent opacity-20"></div>
-          
-          <div className="text-center sm:text-left flex-1">
-            <h3 className="text-xl font-bold text-white mb-2">Custom Orders & Lab Manuals</h3>
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              Need full Lab Manuals, bulk Xeroxes, or custom spiral binding? We do that too at heavy student discounts.
+        {/* OUR INITIATIVE SECTION */}
+        <div className="max-w-4xl mx-auto mt-16 px-4">
+          <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-3xl p-8 sm:p-12 text-center space-y-6">
+            <div className="inline-flex items-center justify-center p-3 bg-zinc-800/50 rounded-2xl mb-2">
+              <Users className="w-6 h-6 text-zinc-300" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">A Student-Led Initiative</h2>
+            <p className="text-zinc-400 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
+              Print Studio ABESEC is a self-funded, independent initiative started by <strong className="text-zinc-200">Anant Thakkur</strong> and <strong className="text-zinc-200">Sribendu Prasad Muduli</strong>. We built this to solve a problem we faced every day: the hassle of overpriced, slow, and inconvenient printing. We are dedicated to providing our fellow engineering students with a seamless, affordable alternative.
+            </p>
+            <p className="text-zinc-500 italic text-sm mt-6">
+              🤫 Legend says if the faculty finds out about these prices, the matrix will collapse. Let's keep this our little secret.
             </p>
           </div>
-          
-          <a
-            href="https://wa.me/917982350793"
-            target="_blank"
-            rel="noreferrer"
-            className="shrink-0 bg-white hover:bg-zinc-200 text-zinc-950 font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg"
-          >
-            <MessageCircle className="w-5 h-5" />
-            Message Us
-          </a>
+        </div>
+
+        {/* CUSTOM BANNER */}
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-xl">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zinc-500 to-transparent opacity-20"></div>
+            
+            <div className="text-center sm:text-left flex-1">
+              <h3 className="text-xl font-bold text-white mb-2">Custom Orders & Lab Manuals</h3>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                Need full Lab Manuals, bulk Xeroxes, or custom spiral binding? We do that too at heavy student discounts.
+              </p>
+            </div>
+            
+            <a
+              href="https://wa.me/917982350793"
+              target="_blank"
+              rel="noreferrer"
+              className="shrink-0 bg-white hover:bg-zinc-200 text-zinc-950 font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Message Us
+            </a>
+          </div>
         </div>
       </div>
     </div>
