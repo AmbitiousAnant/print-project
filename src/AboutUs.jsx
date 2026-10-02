@@ -150,7 +150,7 @@ export default function AboutUs() {
                 <MapPin className="w-8 h-8 text-[#1a1917]" />
                 <div>
                   <p className="text-sm text-[#5a5750] font-bold uppercase tracking-wider">Location</p>
-                  <p className="text-lg font-bold text-[#1a1917]">Campus Hostels</p>
+                  <p className="text-lg font-bold text-[#1a1917]">Sweet Homes</p>
                 </div>
               </div>
             </div>

@@ -146,12 +146,12 @@ export default function CalculatorsCategory() {
                   <ShoppingCart className="w-5 h-5" /> Add to Cart
                 </button>
                 <a 
-                  href="https://www.amazon.in/Casio-FX-991ES-Plus-2nd-Scientific-Calculator/dp/B0846D5CBP"
+                  href="https://www.casio.com/in/scientific-calculators/product.FX-991ESPLUS-2/"
                   target="_blank" 
                   rel="noreferrer"
                   className="w-full xl:w-auto bg-transparent border-2 border-[#1a1917] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                 >
-                  <ExternalLink className="w-4 h-4" /> Amazon
+                  <ExternalLink className="w-4 h-4" /> View Specs
                 </a>
               </div>
             </div>
@@ -202,7 +202,7 @@ export default function CalculatorsCategory() {
                   <ShoppingCart className="w-5 h-5" /> Add to Cart
                 </button>
                 <a 
-                  href="https://www.casio-intl.com/asia/en/calc/products/fx-100MS_2/"
+                  href="https://www.casio.com/in/scientific-calculators/product.FX-100MS-2/"
                   target="_blank" 
                   rel="noreferrer"
                   className="w-full xl:w-auto bg-transparent border-2 border-[#1a1917] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
