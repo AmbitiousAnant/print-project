@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { User, FileText, Phone, ShoppingCart, ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { User, FileText, Phone, ShoppingCart, ArrowLeft, CheckCircle2, ExternalLink } from 'lucide-react'
 import { useCart } from './CartContext'
 
 export default function CalculatorsCategory() {
@@ -40,7 +40,7 @@ export default function CalculatorsCategory() {
       whatsapp_number: `+91${formData.whatsapp_number}`,
       item_type: 'Calculator',
       item_details: model,
-      copies: 1, // Defaulting to 1 per click
+      copies: 1,
       total_price: price
     }
 
@@ -48,23 +48,6 @@ export default function CalculatorsCategory() {
     setSuccessMsg(`${model} added to your cart!`)
     setTimeout(() => setSuccessMsg(''), 4000)
   }
-
-  const calculators = [
-    {
-      id: 1,
-      model: "Casio fx-991ES Plus",
-      price: 1000,
-      specs: "Non-Programmable, 417 Functions. Standard engineering requirement.",
-      image: "https://images.unsplash.com/photo-1587145820266-a5951ee6f620?auto=format&fit=crop&w=800"
-    },
-    {
-      id: 2,
-      model: "Casio fx-82MS",
-      price: 500,
-      specs: "Standard 240 Functions. Perfect for foundational mathematics.",
-      image: "https://images.unsplash.com/photo-1574607383471-42faef81451e?auto=format&fit=crop&w=800"
-    }
-  ]
 
   return (
     <div className="flex-1 w-full bg-[#d4cebd] text-[#1a1917] font-sans pb-32 pt-12">
@@ -115,27 +98,121 @@ export default function CalculatorsCategory() {
 
         {/* Product Grid */}
         <h2 className="text-xl font-bold font-serif text-[#1a1917] mb-6 border-b border-black/10 pb-2">2. Select a Model</h2>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {calculators.map(calc => (
-            <div key={calc.id} className="bg-[#cbc4b1] rounded-3xl overflow-hidden shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] flex flex-col">
-              <div className="h-64 bg-[#1a1917] overflow-hidden border-b border-black/10">
-                <img src={calc.image} alt={calc.model} className="w-full h-full object-cover grayscale contrast-125 mix-blend-multiply opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-700" />
+          
+          {/* MODEL 1: 991ES Plus */}
+          <div className="bg-[#cbc4b1] rounded-3xl overflow-hidden shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] flex flex-col">
+            <div className="h-64 bg-[#1a1917] overflow-hidden border-b border-black/10">
+              <img 
+                src="https://images.unsplash.com/photo-1587145820266-a5951ee6f620?auto=format&fit=crop&w=800" 
+                alt="Casio fx-991ES Plus" 
+                className="w-full h-full object-cover grayscale contrast-125 mix-blend-multiply opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-700" 
+              />
+            </div>
+            <div className="p-8 flex flex-col flex-1">
+              <h3 className="text-2xl font-bold font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">
+                Casio fx-991ES Plus 2nd Edition
+              </h3>
+              <p className="text-[#5a5750] font-medium mt-3 leading-relaxed">
+                417 Functions, Natural Textbook Display, Non-Programmable. The ultimate engineering standard.
+              </p>
+              
+              {/* Price Comparison Table */}
+              <div className="mt-6 mb-8 bg-[#d4cebd]/50 rounded-2xl p-5 border border-black/5 shadow-inner">
+                <table className="w-full text-left border-collapse">
+                  <tbody>
+                    <tr className="border-b border-black/5">
+                      <td className="py-2.5 text-[#5a5750] font-medium">Casio Official</td>
+                      <td className="py-2.5 text-right font-bold text-[#1a1917]/50 line-through decoration-black/30">₹1,595</td>
+                    </tr>
+                    <tr className="border-b border-black/5">
+                      <td className="py-2.5 text-[#5a5750] font-medium">Amazon/Flipkart</td>
+                      <td className="py-2.5 text-right font-bold text-[#1a1917]/50 line-through decoration-black/30">~₹1,450</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 text-[#1a1917] font-black font-serif">Print Studio</td>
+                      <td className="py-2.5 text-right font-black text-[#c25134] text-xl">₹1300</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <div className="p-8 flex flex-col flex-1">
-                <h3 className="text-2xl font-bold font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">{calc.model}</h3>
-                <p className="text-[#5a5750] font-medium mt-2 flex-1">{calc.specs}</p>
-                <div className="mt-8 flex items-center justify-between">
-                  <span className="text-3xl font-black text-[#c25134] font-serif">₹{calc.price}</span>
-                  <button 
-                    onClick={() => handleAddToCart(calc.model, calc.price)}
-                    className="bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-3 px-6 rounded-xl transition-all flex items-center gap-2 shadow-lg"
-                  >
-                    <ShoppingCart className="w-5 h-5" /> Add
-                  </button>
-                </div>
+
+              <div className="mt-auto flex flex-col xl:flex-row items-center gap-4">
+                <button 
+                  onClick={() => handleAddToCart("Casio fx-991ES Plus 2nd Edition", 1000)}
+                  className="w-full bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg"
+                >
+                  <ShoppingCart className="w-5 h-5" /> Add to Cart
+                </button>
+                <a 
+                  href="https://www.amazon.in/Casio-FX-991ES-Plus-2nd-Scientific-Calculator/dp/B0846D5CBP"
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="w-full xl:w-auto bg-transparent border-2 border-[#1a1917] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                >
+                  <ExternalLink className="w-4 h-4" /> Amazon
+                </a>
               </div>
             </div>
-          ))}
+          </div>
+
+          {/* MODEL 2: 100MS */}
+          <div className="bg-[#cbc4b1] rounded-3xl overflow-hidden shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] flex flex-col">
+            <div className="h-64 bg-[#1a1917] overflow-hidden border-b border-black/10">
+              <img 
+                src="https://images.unsplash.com/photo-1574607383471-42faef81451e?auto=format&fit=crop&w=800" 
+                alt="Casio fx-100MS" 
+                className="w-full h-full object-cover grayscale contrast-125 mix-blend-multiply opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-700" 
+              />
+            </div>
+            <div className="p-8 flex flex-col flex-1">
+              <h3 className="text-2xl font-bold font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">
+                Casio fx-100MS 2nd Edition
+              </h3>
+              <p className="text-[#5a5750] font-medium mt-3 leading-relaxed">
+                300 Functions, 2-line Display. Reliable, straightforward, and exam-safe.
+              </p>
+              
+              {/* Price Comparison Table */}
+              <div className="mt-6 mb-8 bg-[#d4cebd]/50 rounded-2xl p-5 border border-black/5 shadow-inner">
+                <table className="w-full text-left border-collapse">
+                  <tbody>
+                    <tr className="border-b border-black/5">
+                      <td className="py-2.5 text-[#5a5750] font-medium">Casio Official</td>
+                      <td className="py-2.5 text-right font-bold text-[#1a1917]/50 line-through decoration-black/30">₹1,135</td>
+                    </tr>
+                    <tr className="border-b border-black/5">
+                      <td className="py-2.5 text-[#5a5750] font-medium">Amazon/Flipkart</td>
+                      <td className="py-2.5 text-right font-bold text-[#1a1917]/50 line-through decoration-black/30">~₹1,026</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 text-[#1a1917] font-black font-serif">Print Studio</td>
+                      <td className="py-2.5 text-right font-black text-[#c25134] text-xl">₹1000</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-auto flex flex-col xl:flex-row items-center gap-4">
+                <button 
+                  onClick={() => handleAddToCart("Casio fx-100MS 2nd Edition", 850)}
+                  className="w-full bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg"
+                >
+                  <ShoppingCart className="w-5 h-5" /> Add to Cart
+                </button>
+                <a 
+                  href="https://www.casio-intl.com/asia/en/calc/products/fx-100MS_2/"
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="w-full xl:w-auto bg-transparent border-2 border-[#1a1917] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                >
+                  <ExternalLink className="w-4 h-4" /> View Specs
+                </a>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>

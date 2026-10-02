@@ -1,12 +1,13 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import Storefront from './StoreFront'
+import Storefront from './Storefront'
 import PrintPage from './PrintPage'
 import CalculatorsCategory from './CalculatorsCategory'
 import RegistersCategory from './RegistersCategory'
 import Cart from './Cart'
 import TrackOrder from './TrackOrder'
 import AdminDashboard from './AdminDashboard'
+import AboutUs from './AboutUs' // <-- Added import for About Us
 import { Printer, MessageCircle, Linkedin, ShoppingCart } from 'lucide-react'
 import { Analytics } from "@vercel/analytics/react"
 import { CartProvider, useCart } from './CartContext'
@@ -24,6 +25,10 @@ function Navbar() {
           <span className="font-semibold text-lg tracking-tight">Print Studio</span>
         </Link>
         <div className="flex items-center gap-6">
+          {/* NEW ABOUT US LINK */}
+          <Link to="/about" className="text-sm text-[#d4cebd] hover:text-white transition-colors font-medium">
+            About Us
+          </Link>
           <Link to="/track" className="text-sm text-[#d4cebd] hover:text-white transition-colors font-medium">
             Track Order
           </Link>
@@ -59,6 +64,8 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/track" element={<TrackOrder />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              {/* NEW ABOUT US ROUTE */}
+              <Route path="/about" element={<AboutUs />} />
             </Routes>
           </main>
 
