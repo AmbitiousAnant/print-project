@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Printer, ArrowRight } from 'lucide-react'
 
 export default function Storefront() {
+  const [showComingSoon, setShowComingSoon] = useState(false)
+
   return (
-    <div className="flex-1 w-full flex flex-col font-sans">
+    <div className="flex-1 w-full flex flex-col font-sans relative">
       
       {/* FLAGSHIP HERO SECTION - DARK PAPER */}
       <div className="bg-[#1a1917] pt-24 pb-32 px-4 text-center">
@@ -71,10 +73,10 @@ export default function Storefront() {
               </div>
             </Link>
 
-            {/* Register Card */}
-            <Link 
-              to="/registers" 
-              className="group block bg-[#cbc4b1] rounded-3xl overflow-hidden shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] transition-all hover:ring-4 ring-[#c25134]/50"
+            {/* Register Card (Modal Trigger) */}
+            <div 
+              onClick={() => setShowComingSoon(true)}
+              className="group block cursor-pointer bg-[#cbc4b1] rounded-3xl overflow-hidden shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] transition-all hover:ring-4 ring-[#c25134]/50"
             >
               <div className="h-72 overflow-hidden border-b border-black/5 bg-[#1a1917]">
                 <img 
@@ -94,11 +96,32 @@ export default function Storefront() {
                   <ArrowRight className="w-6 h-6" />
                 </div>
               </div>
-            </Link>
+            </div>
 
           </div>
         </div>
       </div>
+
+      {/* COMING SOON MODAL */}
+      {showComingSoon && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1a1917]/60 backdrop-blur-sm">
+          <div className="bg-[#d4cebd] text-[#1a1917] p-8 rounded-2xl max-w-sm w-full mx-4 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.7),_5px_5px_15px_rgba(0,0,0,0.5)] text-center border border-black/5">
+            <h2 className="text-3xl font-bold font-serif mb-4 [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.1),_1px_1px_1px_rgba(255,255,255,1)]">
+              Coming Soon
+            </h2>
+            <p className="text-[#5a5750] font-medium text-lg leading-relaxed mb-8">
+              Our premium college registers are currently being restocked. Please check back soon!
+            </p>
+            <button 
+              onClick={() => setShowComingSoon(false)}
+              className="w-full bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg tracking-wide"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
