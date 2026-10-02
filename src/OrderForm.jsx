@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react'
-import { supabase } from './supabaseClient'
-import { CheckCircle2, Loader2, Link as LinkIcon, FileText, User, Phone, MessageCircle, Users } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { CheckCircle2, Link as LinkIcon, FileText, User, Phone, MessageCircle, Users, ShoppingCart } from 'lucide-react'
+import { useCart } from './CartContext'
 
 export default function OrderForm() {
+  const { addToCart } = useCart()
   const [itemType, setItemType] = useState('Print') // 'Print', 'Register', 'Calculator'
-
+  
   const [formData, setFormData] = useState({
     student_name: '',
     roll_number: '',
@@ -20,14 +22,22 @@ export default function OrderForm() {
     calculator_type: '100MS - ₹1000',
     quantity: 1
   })
-
-  const [loading, setLoading] = useState(false)
+  
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    
+    // Custom handler to restrict WhatsApp number to exactly 10 digits
+    if (name === 'whatsapp_number') {
+      const numbersOnly = value.replace(/\D/g, '') // Strip non-numeric characters
+      if (numbersOnly.length <= 10) {
+        setFormData(prev => ({ ...prev, [name]: numbersOnly }))
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }))
+    }
   }
 
   const calculatedPrice = useMemo(() => {
@@ -36,15 +46,15 @@ export default function OrderForm() {
       const p = parseInt(formData.pages) || 0;
       const c = parseInt(formData.copies) || 1;
       const totalPages = p * c;
-
-      if (totalPages < 20) return 0; // Invalid, handled on submit
-
+      
+      if (totalPages < 20) return 0;
+      
       if (formData.print_type === 'Color') {
         price = totalPages * 10;
       } else {
         price = 25 + ((totalPages - 20) * 1.5);
       }
-
+      
       if (formData.sides === 'Double-Sided') {
         price += 10;
       }
@@ -63,88 +73,81 @@ export default function OrderForm() {
     return price;
   }, [itemType, formData.pages, formData.print_type, formData.sides, formData.copies, formData.register_type, formData.calculator_type, formData.quantity]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    setLoading(true)
     setError('')
-
-    try {
-      const p = parseInt(formData.pages) || 0;
-      const c = parseInt(formData.copies) || 1;
-
-      if (itemType === 'Print' && (p * c) < 20) {
-        throw new Error("Total combined pages (Pages × Copies) must be at least 20.");
-      }
-
-      const { data: activeOrders, error: checkError } = await supabase
-        .from('orders')
-        .select('id')
-        .eq('roll_number', formData.roll_number.trim())
-        .in('status', ['Pending', 'Accepted', 'Printed']);
-
-      if (checkError) throw checkError;
-
-      if (activeOrders && activeOrders.length > 0) {
-        throw new Error("Your previous order is still active. You can only have one active order at a time.");
-      }
-
-      const orderData = {
-        student_name: formData.student_name,
-        roll_number: formData.roll_number,
-        whatsapp_number: formData.whatsapp_number,
-        item_type: itemType,
-        total_price: calculatedPrice
-      }
-
-      if (itemType === 'Print') {
-        orderData.document_url = formData.document_url
-        orderData.print_type = formData.print_type
-        orderData.sides = formData.sides
-        orderData.copies = parseInt(formData.copies)
-        orderData.item_details = `${formData.pages} Pages`
-      } else if (itemType === 'Register') {
-        orderData.item_details = formData.register_type
-        orderData.copies = parseInt(formData.quantity) // using copies column to store quantity
-      } else if (itemType === 'Calculator') {
-        orderData.item_details = formData.calculator_type
-        orderData.copies = parseInt(formData.quantity)
-      }
-
-      const { error: submitError } = await supabase
-        .from('orders')
-        .insert([orderData])
-
-      if (submitError) throw submitError
-
-      setSuccess(true)
-    } catch (err) {
-      console.error(err)
-      setError(err.message || 'Failed to place order. Please try again.')
-    } finally {
-      setLoading(false)
+    
+    const p = parseInt(formData.pages) || 0;
+    const c = parseInt(formData.copies) || 1;
+    
+    // Validations
+    if (itemType === 'Print' && (p * c) < 20) {
+      setError("Total combined pages (Pages × Copies) must be at least 20.");
+      return;
     }
+
+    if (formData.whatsapp_number.length !== 10) {
+      setError("Please enter exactly 10 digits for your WhatsApp number.");
+      return;
+    }
+
+    // Build cart item and prepend +91 to the database payload
+    const cartItem = {
+      student_name: formData.student_name,
+      roll_number: formData.roll_number,
+      whatsapp_number: `+91${formData.whatsapp_number}`,
+      item_type: itemType,
+      total_price: calculatedPrice
+    }
+
+    if (itemType === 'Print') {
+      cartItem.document_url = formData.document_url
+      cartItem.print_type = formData.print_type
+      cartItem.sides = formData.sides
+      cartItem.copies = parseInt(formData.copies)
+      cartItem.item_details = `${formData.pages} Pages`
+    } else if (itemType === 'Register') {
+      cartItem.item_details = formData.register_type
+      cartItem.copies = parseInt(formData.quantity)
+    } else if (itemType === 'Calculator') {
+      cartItem.item_details = formData.calculator_type
+      cartItem.copies = parseInt(formData.quantity)
+    }
+
+    addToCart(cartItem)
+    setSuccess(true)
   }
 
+  // --- ADDED TO CART SUCCESS SCREEN ---
   if (success) {
     return (
       <div className="flex-1 w-full flex items-center justify-center bg-[#d4cebd] p-4 font-sans min-h-[60vh]">
-        <div className="bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-3xl p-8 sm:p-12 max-w-md w-full text-center space-y-6">
+        <div className="bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-3xl p-8 sm:p-12 max-w-md w-full text-center space-y-6 border border-black/5">
           <div className="mx-auto w-20 h-20 bg-[#1a1917] rounded-full flex items-center justify-center shadow-xl">
-            <CheckCircle2 className="w-10 h-10 text-[#d4cebd]" />
+            <ShoppingCart className="w-10 h-10 text-[#d4cebd]" />
           </div>
-          <h2 className="text-3xl font-bold font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">Order Placed!</h2>
+          <h2 className="text-3xl font-bold font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">Added to Cart!</h2>
           <p className="text-[#3a3832] font-medium text-lg leading-relaxed">
-            We've received your request. We will message you on WhatsApp when it's ready.
+            Your item has been queued. You can add more items or proceed to checkout.
           </p>
-          <button
-            onClick={() => {
-              setSuccess(false);
-              setFormData(prev => ({ ...prev, document_url: '', pages: 1, copies: 1, quantity: 1 }));
-            }}
-            className="mt-8 w-full bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-4 px-6 rounded-xl transition-all shadow-lg tracking-wide"
-          >
-            Place Another Order
-          </button>
+          <div className="flex flex-col gap-4 mt-8">
+            <Link
+              to="/cart"
+              className="w-full bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-4 px-6 rounded-xl transition-all shadow-lg tracking-wide block"
+            >
+              View Cart & Checkout
+            </Link>
+            <button
+              onClick={() => {
+                setSuccess(false);
+                // Keep personal details, just clear the specific item config
+                setFormData(prev => ({ ...prev, document_url: '', pages: 1, copies: 1, quantity: 1 }));
+              }}
+              className="w-full bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-4 px-6 rounded-xl transition-all shadow-lg tracking-wide"
+            >
+              Add Another Item
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -152,7 +155,7 @@ export default function OrderForm() {
 
   return (
     <div className="flex-1 w-full flex flex-col font-sans">
-
+      
       {/* HERO SECTION - DARK PAPER */}
       <div className="bg-[#1a1917] pt-16 pb-24 px-4 text-center">
         <h1 className="text-5xl sm:text-7xl font-black text-[#d4cebd] tracking-tighter leading-tight max-w-4xl mx-auto">
@@ -174,7 +177,7 @@ export default function OrderForm() {
       {/* MAIN FORM SECTION - LIGHT PAPER */}
       <div className="bg-[#d4cebd] flex-1 w-full text-[#1a1917]">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-12 pb-32 space-y-16">
-
+          
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4 font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">What do you need today?</h2>
             <p className="text-[#5a5750] font-medium">Select a category below to configure your order.</p>
@@ -182,12 +185,13 @@ export default function OrderForm() {
 
           {/* PRODUCT SELECTION GRID */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
+            
             {/* Print Card */}
-            <div
+            <div 
               onClick={() => { setItemType('Print'); setError(''); }}
-              className={`cursor-pointer group relative rounded-2xl overflow-hidden transition-all duration-300 ${itemType === 'Print' ? 'ring-2 ring-[#c25134] shadow-lg bg-[#d4cebd]' : 'bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)]'
-                }`}
+              className={`cursor-pointer group relative rounded-2xl overflow-hidden transition-all duration-300 ${
+                itemType === 'Print' ? 'ring-2 ring-[#c25134] shadow-lg bg-[#d4cebd]' : 'bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)]'
+              }`}
             >
               <div className="h-48 p-6 flex items-center justify-center border-b border-black/5">
                 <img src="/print.jpg" alt="Document Printing" className="h-48 w-full object-contain grayscale contrast-125 mix-blend-multiply opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -203,10 +207,11 @@ export default function OrderForm() {
             </div>
 
             {/* Register Card */}
-            <div
+            <div 
               onClick={() => { setItemType('Register'); setError(''); }}
-              className={`cursor-pointer group relative rounded-2xl overflow-hidden transition-all duration-300 ${itemType === 'Register' ? 'ring-2 ring-[#c25134] shadow-lg bg-[#d4cebd]' : 'bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)]'
-                }`}
+              className={`cursor-pointer group relative rounded-2xl overflow-hidden transition-all duration-300 ${
+                itemType === 'Register' ? 'ring-2 ring-[#c25134] shadow-lg bg-[#d4cebd]' : 'bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)]'
+              }`}
             >
               <div className="h-48 p-6 flex items-center justify-center border-b border-black/5">
                 <img src="/register.jpg" alt="College Registers" className="h-48 w-full object-contain grayscale contrast-125 mix-blend-multiply opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -222,10 +227,11 @@ export default function OrderForm() {
             </div>
 
             {/* Calculator Card */}
-            <div
+            <div 
               onClick={() => { setItemType('Calculator'); setError(''); }}
-              className={`cursor-pointer group relative rounded-2xl overflow-hidden transition-all duration-300 ${itemType === 'Calculator' ? 'ring-2 ring-[#c25134] shadow-lg bg-[#d4cebd]' : 'bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)]'
-                }`}
+              className={`cursor-pointer group relative rounded-2xl overflow-hidden transition-all duration-300 ${
+                itemType === 'Calculator' ? 'ring-2 ring-[#c25134] shadow-lg bg-[#d4cebd]' : 'bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)]'
+              }`}
             >
               <div className="h-48 p-6 flex items-center justify-center border-b border-black/5">
                 <img src="/calculator.jpg" alt="Scientific Calculators" className="h-48 w-full object-contain grayscale contrast-125 mix-blend-multiply opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -243,7 +249,7 @@ export default function OrderForm() {
 
           {/* DYNAMIC CONFIGURATION SECTION */}
           <form onSubmit={handleSubmit} className="relative mt-12 max-w-4xl mx-auto">
-
+            
             {error && (
               <div className="mb-8 p-4 bg-[#c25134]/10 border border-[#c25134]/30 rounded-xl text-[#c25134] text-sm text-center font-bold">
                 {error}
@@ -251,7 +257,7 @@ export default function OrderForm() {
             )}
 
             <div className="space-y-12">
-
+              
               {/* Personal Details */}
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold font-serif text-[#1a1917] border-b-2 border-black/10 pb-2 [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">Personal Details</h3>
@@ -265,7 +271,7 @@ export default function OrderForm() {
                       <input required name="student_name" value={formData.student_name} onChange={handleChange} className="w-full bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] border-none rounded-xl py-3 pl-10 pr-4 text-base font-medium text-[#1a1917] focus:outline-none focus:ring-2 focus:ring-[#c25134] transition-all placeholder:text-[#1a1917]/40" placeholder="Anant Thakkur" />
                     </div>
                   </div>
-
+                  
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-[#3a3832] uppercase tracking-wider">Roll Number</label>
                     <div className="relative">
@@ -278,11 +284,22 @@ export default function OrderForm() {
 
                   <div className="space-y-2 sm:col-span-2">
                     <label className="text-sm font-bold text-[#3a3832] uppercase tracking-wider">WhatsApp Number</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Phone className="h-5 w-5 text-[#1a1917]/50" />
+                    <div className="flex items-stretch bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#c25134] transition-all">
+                      <div className="flex items-center pl-4 pr-3 border-r border-black/10">
+                        <Phone className="h-5 w-5 text-[#1a1917]/50 mr-2" />
+                        <span className="text-[#1a1917] font-bold text-base">+91</span>
                       </div>
-                      <input required type="tel" name="whatsapp_number" value={formData.whatsapp_number} onChange={handleChange} className="w-full bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] border-none rounded-xl py-3 pl-10 pr-4 text-base font-medium text-[#1a1917] focus:outline-none focus:ring-2 focus:ring-[#c25134] transition-all placeholder:text-[#1a1917]/40" placeholder="+91 98765 43210" />
+                      <input 
+                        required 
+                        type="tel" 
+                        name="whatsapp_number" 
+                        value={formData.whatsapp_number} 
+                        onChange={handleChange} 
+                        pattern="[0-9]{10}"
+                        maxLength="10"
+                        className="w-full bg-transparent border-none py-3 px-4 text-base font-medium text-[#1a1917] focus:outline-none focus:ring-0 transition-all placeholder:text-[#1a1917]/40" 
+                        placeholder="9876543210" 
+                      />
                     </div>
                   </div>
                 </div>
@@ -310,7 +327,7 @@ export default function OrderForm() {
                       <label className="text-sm font-bold text-[#3a3832] uppercase tracking-wider">Color Type</label>
                       <div className="flex bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-xl p-1.5">
                         {['Black & White', 'Color'].map((type) => (
-                          <button key={type} type="button" onClick={() => setFormData(prev => ({ ...prev, print_type: type }))} className={`flex-1 text-sm py-2.5 rounded-lg font-bold transition-all ${formData.print_type === type ? 'bg-[#1a1917] text-[#d4cebd] shadow-md' : 'text-[#3a3832] hover:text-[#1a1917]'}`}>
+                          <button key={type} type="button" onClick={() => setFormData(prev => ({ ...prev, print_type: type }))} className={`flex-1 text-sm py-2.5 rounded-lg font-bold transition-all ${ formData.print_type === type ? 'bg-[#1a1917] text-[#d4cebd] shadow-md' : 'text-[#3a3832] hover:text-[#1a1917]' }`}>
                             {type === 'Black & White' ? 'B&W' : 'Color'}
                           </button>
                         ))}
@@ -321,7 +338,7 @@ export default function OrderForm() {
                       <label className="text-sm font-bold text-[#3a3832] uppercase tracking-wider">Sides</label>
                       <div className="flex bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-xl p-1.5">
                         {['Single-Sided', 'Double-Sided'].map((side) => (
-                          <button key={side} type="button" onClick={() => setFormData(prev => ({ ...prev, sides: side }))} className={`flex-1 text-sm py-2.5 rounded-lg font-bold transition-all ${formData.sides === side ? 'bg-[#1a1917] text-[#d4cebd] shadow-md' : 'text-[#3a3832] hover:text-[#1a1917]'}`}>
+                          <button key={side} type="button" onClick={() => setFormData(prev => ({ ...prev, sides: side }))} className={`flex-1 text-sm py-2.5 rounded-lg font-bold transition-all ${ formData.sides === side ? 'bg-[#1a1917] text-[#d4cebd] shadow-md' : 'text-[#3a3832] hover:text-[#1a1917]' }`}>
                             {side.split('-')[0]}
                           </button>
                         ))}
@@ -340,7 +357,7 @@ export default function OrderForm() {
                         <p className="text-[#c25134] text-xs mt-1 font-bold">Total (Pages × Copies) must be 20+.</p>
                       )}
                     </div>
-
+                    
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-[#3a3832] uppercase tracking-wider">Copies</label>
                       <input required type="number" min="1" name="copies" value={formData.copies} onChange={handleChange} className="w-full bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] border-none rounded-xl py-3 px-4 text-base font-medium text-[#1a1917] focus:outline-none focus:ring-2 focus:ring-[#c25134] transition-all" />
@@ -399,14 +416,10 @@ export default function OrderForm() {
                 </div>
                 <button
                   type="submit"
-                  disabled={loading || (itemType === 'Print' && (parseInt(formData.pages) * parseInt(formData.copies)) < 20)}
+                  disabled={itemType === 'Print' && (parseInt(formData.pages) * parseInt(formData.copies)) < 20}
                   className="w-full sm:w-auto bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-4 px-10 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg shadow-lg tracking-wide"
                 >
-                  {loading ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
-                  ) : (
-                    'Confirm Request'
-                  )}
+                  <ShoppingCart className="w-5 h-5" /> Add to Cart
                 </button>
               </div>
             </div>
@@ -420,7 +433,7 @@ export default function OrderForm() {
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold font-serif text-[#1a1917] tracking-tight [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">A Student-Led Initiative</h2>
               <p className="text-[#3a3832] text-base sm:text-lg leading-relaxed max-w-3xl mx-auto font-medium">
-                Print Studio ABESEC is a self-funded, independent initiative started by <strong className="text-[#1a1917]">Anant Thakkur</strong> and <strong className="text-[#1a1917]">Sribendu Prasad Muduli</strong>. We built this to solve a problem we faced every day: the hassle of overpriced, slow, and inconvenient printing. We are dedicated to providing our fellow engineering students with a seamless, affordable alternative.
+                Print Studio is a self-funded, independent initiative started by <strong className="text-[#1a1917]">Anant Thakkur</strong> and <strong className="text-[#1a1917]">Sribendu Prasad Muduli</strong>. We built this to solve a problem we faced every day: the hassle of overpriced, slow, and inconvenient printing. We are dedicated to providing our fellow students with a seamless, affordable alternative.
               </p>
               <p className="text-[#c25134] font-serif italic text-sm mt-6 font-semibold">
                 🤫 Legend says if the faculty finds out about these prices, the matrix will collapse. Let's keep this our little secret.
@@ -437,7 +450,7 @@ export default function OrderForm() {
                   Need full Lab Manuals, bulk Xeroxes, or custom spiral binding? We do that too at heavy student discounts.
                 </p>
               </div>
-
+              
               <a
                 href="https://wa.me/917982350793"
                 target="_blank"

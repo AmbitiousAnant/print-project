@@ -1,289 +1,159 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
-import { ExternalLink, Printer, CheckCircle, Clock, LogOut, Package, BookOpen, Calculator } from 'lucide-react'
+import { Loader2, RefreshCw, Check, Printer, Truck, XCircle } from 'lucide-react'
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loginError, setLoginError] = useState('')
-  const [isLoggingIn, setIsLoggingIn] = useState(false)
-  
-  const [filter, setFilter] = useState('Active') // Active, Completed
-  
-  useEffect(() => {
-    checkSession()
-  }, [])
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchOrders()
-    }
-  }, [isAuthenticated])
-
-  const checkSession = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session) {
-      setIsAuthenticated(true)
-    }
-    setLoading(false)
-  }
-
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    setIsLoggingIn(true)
-    setLoginError('')
-    
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      setLoginError(error.message)
-    } else {
-      setIsAuthenticated(true)
-    }
-    setIsLoggingIn(false)
-  }
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    setIsAuthenticated(false)
-  }
 
   const fetchOrders = async () => {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .order('created_at', { ascending: false })
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false })
       
-    if (error) {
-      console.error('Error fetching orders:', error)
-    } else {
+      if (error) throw error
       setOrders(data || [])
+    } catch (err) {
+      console.error('Error fetching orders:', err)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
+
+  useEffect(() => {
+    fetchOrders()
+  }, [])
 
   const updateStatus = async (id, newStatus) => {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status: newStatus })
-      .eq('id', id)
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('id', id)
       
-    if (!error) {
+      if (error) throw error
+      
+      // Update local state to reflect change instantly
       setOrders(orders.map(order => order.id === id ? { ...order, status: newStatus } : order))
-    }
-  }
-
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'Pending': return 'text-amber-400'
-      case 'Accepted': return 'text-green-500'
-      case 'Rejected': return 'text-red-500'
-      case 'Printed': return 'text-blue-400'
-      case 'Completed': return 'text-emerald-400'
-      default: return 'text-zinc-400'
-    }
-  }
-
-  if (loading && !isAuthenticated) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="inline-block animate-spin w-8 h-8 border-4 border-zinc-800 border-t-white rounded-full"></div>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 max-w-sm w-full shadow-2xl">
-          <h2 className="text-xl font-bold text-white mb-6 text-center">Admin Login</h2>
-          {loginError && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-              {loginError}
-            </div>
-          )}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-zinc-400">Email</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full mt-1 bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
-                placeholder="admin@printstudio.com"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-zinc-400">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full mt-1 bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
-                placeholder="••••••••"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isLoggingIn}
-              className="w-full bg-white hover:bg-zinc-200 text-zinc-950 font-semibold py-2.5 px-4 rounded-xl transition-all disabled:opacity-50"
-            >
-              {isLoggingIn ? 'Logging in...' : 'Login'}
-            </button>
-          </form>
-        </div>
-      </div>
-    )
-  }
-
-  const filteredOrders = orders.filter(order => 
-    filter === 'Active' 
-      ? !['Completed', 'Rejected'].includes(order.status)
-      : ['Completed', 'Rejected'].includes(order.status)
-  )
-
-  const getItemIcon = (type) => {
-    switch(type) {
-      case 'Print': return <Printer className="w-4 h-4" />
-      case 'Register': return <BookOpen className="w-4 h-4" />
-      case 'Calculator': return <Calculator className="w-4 h-4" />
-      default: return <Package className="w-4 h-4" />
+    } catch (err) {
+      console.error('Failed to update status:', err)
+      alert('Failed to update order status.')
     }
   }
 
   return (
-    <div className="flex-1 py-4 sm:py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Order Management</h1>
-          <p className="text-zinc-400 text-sm mt-1">Manage all incoming requests.</p>
-        </div>
+    <div className="w-full text-zinc-300 bg-zinc-950 font-sans p-4 sm:p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         
-        <div className="flex gap-4">
-          <div className="flex bg-zinc-900 rounded-xl border border-zinc-800 p-1">
-            {['Active', 'Completed'].map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`text-sm py-1.5 px-4 rounded-lg font-medium transition-all ${
-                  filter === f
-                    ? 'bg-zinc-800 text-white shadow-sm'
-                    : 'text-zinc-500 hover:text-zinc-300'
-                }`}
-              >
-                {f}
-              </button>
-            ))}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-white tracking-tight">Admin Portal</h1>
+            <p className="text-zinc-500 font-medium mt-1">Manage and update active student orders.</p>
           </div>
           <button 
-            onClick={handleLogout}
-            className="p-2 border border-zinc-800 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all"
-            title="Logout"
+            onClick={fetchOrders}
+            className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-lg border border-zinc-800 transition-colors text-sm font-semibold"
           >
-            <LogOut className="w-5 h-5" />
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            Refresh Data
           </button>
         </div>
-      </div>
 
-      {loading ? (
-        <div className="text-center py-20">
-          <div className="inline-block animate-spin w-8 h-8 border-4 border-zinc-800 border-t-white rounded-full"></div>
-        </div>
-      ) : filteredOrders.length === 0 ? (
-        <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-12 text-center">
-          <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-zinc-500" />
-          </div>
-          <h3 className="text-xl font-medium text-white mb-2">No {filter.toLowerCase()} orders</h3>
-          <p className="text-zinc-500">You're all caught up!</p>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {filteredOrders.map(order => (
-            <div key={order.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex flex-col lg:flex-row gap-6 lg:items-center">
-              
-              <div className="flex-1 space-y-3">
-                <div className="flex items-start justify-between sm:items-center">
-                  <div className="flex items-center gap-3">
-                    <span className="text-zinc-500 font-mono font-medium text-lg">#{orders.length - orders.findIndex(o => o.id === order.id)}</span>
-                    <h3 className="font-semibold text-white text-lg">{order.student_name}</h3>
-                    <span className="text-xs font-mono bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded-md">
-                      {order.roll_number}
-                    </span>
-                  </div>
-                  <div className="text-lg font-bold text-white bg-zinc-950 px-3 py-1 rounded-lg border border-zinc-800">
-                    ₹{order.total_price}
-                  </div>
-                </div>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-zinc-950 text-zinc-500 font-semibold uppercase tracking-wider text-xs">
+                <tr>
+                  <th className="px-6 py-4">Student Info</th>
+                  <th className="px-6 py-4">Item Details</th>
+                  <th className="px-6 py-4">Total</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800">
+                {orders.map((order) => (
+                  <tr key={order.id} className="hover:bg-zinc-800/30 transition-colors">
+                    
+                    <td className="px-6 py-4">
+                      <p className="text-white font-bold">{order.student_name}</p>
+                      <p className="text-zinc-400 font-mono text-xs mt-1">{order.roll_number}</p>
+                      <a href={`https://wa.me/${order.whatsapp_number?.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-300 text-xs mt-1 block">
+                        {order.whatsapp_number}
+                      </a>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <span className="inline-block px-2 py-1 bg-zinc-800 text-zinc-300 rounded text-xs font-bold mb-2">
+                        {order.item_type}
+                      </span>
+                      <p className="text-zinc-300 text-sm">{order.item_details}</p>
+                      {order.item_type === 'Print' && (
+                        <div className="text-xs text-zinc-500 mt-1 flex flex-col gap-0.5">
+                          <span>{order.print_type} • {order.sides} • {order.copies} Copies</span>
+                          <a href={order.document_url} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline inline-flex items-center gap-1 mt-1">
+                            <LinkIcon size={12} /> View Document
+                          </a>
+                        </div>
+                      )}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <p className="text-white font-black text-lg">₹{order.total_price}</p>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                        order.status === 'Completed' ? 'bg-green-500/10 text-green-400' :
+                        order.status === 'Printed' ? 'bg-orange-500/10 text-orange-400' :
+                        order.status === 'Accepted' ? 'bg-blue-500/10 text-blue-400' :
+                        'bg-zinc-800 text-zinc-400'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                      {order.status === 'Pending' && (
+                        <button onClick={() => updateStatus(order.id, 'Accepted')} className="inline-flex items-center justify-center p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors" title="Start Printing">
+                          <Printer size={16} />
+                        </button>
+                      )}
+                      {order.status === 'Accepted' && (
+                        <button onClick={() => updateStatus(order.id, 'Printed')} className="inline-flex items-center justify-center p-2 bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 rounded-lg transition-colors" title="Mark Out for Delivery">
+                          <Truck size={16} />
+                        </button>
+                      )}
+                      {order.status === 'Printed' && (
+                        <button onClick={() => updateStatus(order.id, 'Completed')} className="inline-flex items-center justify-center p-2 bg-green-500/10 text-green-400 hover:bg-green-500/20 rounded-lg transition-colors" title="Mark Completed">
+                          <Check size={16} />
+                        </button>
+                      )}
+                      {order.status !== 'Completed' && order.status !== 'Cancelled' && (
+                         <button onClick={() => updateStatus(order.id, 'Cancelled')} className="inline-flex items-center justify-center p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors" title="Cancel Order">
+                         <XCircle size={16} />
+                       </button>
+                      )}
+                    </td>
+
+                  </tr>
+                ))}
                 
-                <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-zinc-400">
-                  <div className="flex items-center gap-1.5 font-medium text-zinc-300 bg-zinc-800/50 px-2.5 py-1 rounded-md">
-                    {getItemIcon(order.item_type)}
-                    {order.item_type}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-medium text-zinc-300">Details:</span> {order.item_details}
-                    {order.item_type === 'Print' && ` • ${order.print_type} • ${order.sides}`}
-                    {` • Qty: ${order.copies}`}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4" />
-                    {new Date(order.created_at).toLocaleDateString()} {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-zinc-300">
-                    <a 
-                      href={`https://wa.me/${order.whatsapp_number.replace(/\D/g,'')}`}
-                      target="_blank" rel="noreferrer"
-                      className="hover:text-white hover:underline transition-all"
-                    >
-                      WhatsApp: {order.whatsapp_number}
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 border-t lg:border-t-0 lg:border-l border-zinc-800 pt-4 lg:pt-0 lg:pl-6">
-                {order.item_type === 'Print' && order.document_url && (order.document_url.startsWith('http://') || order.document_url.startsWith('https://')) && (
-                  <a
-                    href={order.document_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors bg-blue-400/10 hover:bg-blue-400/20 px-3 py-2 rounded-lg"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    View Doc
-                  </a>
+                {orders.length === 0 && !loading && (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-12 text-center text-zinc-500">
+                      No orders found in the database.
+                    </td>
+                  </tr>
                 )}
-
-                <div className="flex items-center bg-zinc-950 rounded-lg border border-zinc-800 overflow-hidden pr-2">
-                  <select
-                    value={order.status}
-                    onChange={(e) => updateStatus(order.id, e.target.value)}
-                    className={`text-sm font-medium outline-none px-3 py-2.5 appearance-none bg-transparent cursor-pointer ${getStatusColor(order.status)}`}
-                  >
-                    <option value="Pending" className="text-zinc-900">Pending</option>
-                    <option value="Accepted" className="text-zinc-900">Accepted</option>
-                    <option value="Printed" className="text-zinc-900">Printed</option>
-                    <option value="Completed" className="text-zinc-900">Completed</option>
-                    <option value="Rejected" className="text-zinc-900">Rejected</option>
-                  </select>
-                </div>
-              </div>
-
-            </div>
-          ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }
