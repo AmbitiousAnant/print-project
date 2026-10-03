@@ -3,34 +3,91 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 
 export default function AdminDashboard() {
+  // --- Auth State ---
+  const [session, setSession] = useState(null)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [authLoading, setAuthLoading] = useState(true)
+  const [authError, setAuthError] = useState(null)
+  
+  // --- Data State ---
   const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [dataLoading, setDataLoading] = useState(true)
+  const [dataError, setDataError] = useState(null)
   
   const navigate = useNavigate()
 
+  // 1. Session Initialization & Listener
   useEffect(() => {
-    fetchOrders()
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setAuthLoading(false)
+    })
+
+    // Listen for auth changes (login/logout)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      setAuthLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
+
+  // 2. Fetch Orders (Only runs when session exists)
+  useEffect(() => {
+    if (session) {
+      fetchOrders()
+    }
+  }, [session])
 
   const fetchOrders = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setDataLoading(true)
+      setDataError(null)
       
-      const { data, fetchError } = await supabase
+      const { data, error } = await supabase
         .from('orders')
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (fetchError) throw fetchError
+      if (error) throw error
       
       setOrders(data || [])
     } catch (err) {
       console.error('Error fetching orders:', err)
-      setError(err.message || 'Failed to fetch orders from the database.')
+      setDataError(err.message || 'Failed to fetch orders from the database.')
     } finally {
-      setLoading(false)
+      setDataLoading(false)
+    }
+  }
+
+  // --- Handlers ---
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setAuthLoading(true)
+    setAuthError(null)
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) {
+      setAuthError(error.message)
+    }
+    setAuthLoading(false)
+  }
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      navigate('/')
+    } catch (err) {
+      console.error('Failed to log out:', err)
+      navigate('/') 
     }
   }
 
@@ -54,18 +111,71 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut()
-      navigate('/')
-    } catch (err) {
-      console.error('Failed to log out:', err)
-      navigate('/') // Force redirect anyway as fallback
-    }
+  // --- Render Initial Auth Loading ---
+  if (authLoading && !session) {
+    return (
+      <div className="min-h-screen bg-[#1a1917] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#d4cebd]/20 border-t-[#c25134] rounded-full animate-spin"></div>
+      </div>
+    )
   }
 
-  // Loading State
-  if (loading) {
+  // --- Render Login Barrier (If no session) ---
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-[#1a1917] flex items-center justify-center p-4 font-sans">
+        <div className="bg-[#d4cebd] text-[#1a1917] p-8 md:p-12 rounded-3xl max-w-md w-full shadow-[inset_2px_2px_5px_rgba(255,255,255,0.7),_5px_5px_25px_rgba(0,0,0,0.5)] border border-[#1a1917]/10">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-black font-serif mb-2 [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.1),_1px_1px_1px_rgba(255,255,255,1)]">
+              Admin Portal
+            </h2>
+            <p className="text-[#5a5750] font-medium">Authorized personnel only.</p>
+          </div>
+          
+          {authError && (
+            <div className="bg-red-900/10 border border-red-900/30 text-red-700 p-4 rounded-xl mb-6 text-sm font-bold text-center">
+              {authError}
+            </div>
+          )}
+          
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#3a3832] uppercase tracking-wider">Email</label>
+              <input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] border-none rounded-xl py-3 px-4 font-medium focus:ring-2 focus:ring-[#c25134] outline-none"
+                placeholder="admin@printstudio.in"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#3a3832] uppercase tracking-wider">Password</label>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] border-none rounded-xl py-3 px-4 font-medium focus:ring-2 focus:ring-[#c25134] outline-none"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+            <button 
+              type="submit" 
+              disabled={authLoading}
+              className="w-full bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg tracking-wide disabled:opacity-50 mt-4"
+            >
+              {authLoading ? 'Authenticating...' : 'Secure Login'}
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
+  // --- Render Dashboard Data Loading ---
+  if (dataLoading) {
     return (
       <div className="min-h-screen bg-[#1a1917] text-[#d4cebd] p-8 flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-4">
@@ -76,13 +186,13 @@ export default function AdminDashboard() {
     )
   }
 
-  // Error State
-  if (error) {
+  // --- Render Dashboard Data Error ---
+  if (dataError) {
     return (
       <div className="min-h-screen bg-[#1a1917] text-[#d4cebd] p-8 flex items-center justify-center font-sans">
         <div className="bg-[#c25134]/10 border border-[#c25134]/40 p-8 rounded-3xl max-w-lg w-full text-center shadow-2xl">
           <h2 className="text-3xl font-black font-serif text-[#c25134] mb-4">Connection Error</h2>
-          <p className="text-[#a09c91] font-medium leading-relaxed">{error}</p>
+          <p className="text-[#a09c91] font-medium leading-relaxed">{dataError}</p>
           <button 
             onClick={fetchOrders}
             className="mt-8 bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-3 px-8 rounded-xl transition-all shadow-lg"
@@ -94,7 +204,7 @@ export default function AdminDashboard() {
     )
   }
 
-  // Data Filtering
+  // --- Prepare Data for Main Render ---
   const activeOrders = orders?.filter(order => {
     const s = (order.status || '').toUpperCase()
     return s !== 'COMPLETED' && s !== 'REJECTED'
@@ -105,7 +215,7 @@ export default function AdminDashboard() {
     return s === 'COMPLETED' || s === 'REJECTED'
   }) || []
 
-  // Reusable Table Generator to keep code clean and maintain separation
+  // Helper function to render tables cleanly
   const renderOrderTable = (title, dataList) => {
     return (
       <div className="mb-16">
@@ -225,7 +335,7 @@ export default function AdminDashboard() {
     )
   }
 
-  // Main Dashboard Return
+  // --- Main Dashboard Render ---
   return (
     <div className="min-h-screen bg-[#1a1917] text-[#d4cebd] p-4 sm:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
