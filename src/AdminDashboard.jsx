@@ -1,158 +1,211 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
-import { Loader2, RefreshCw, Check, Printer, Truck, XCircle } from 'lucide-react'
 
 export default function AdminDashboard() {
+  // 1. Safe State Initialization
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
-
-  const fetchOrders = async () => {
-    setLoading(true)
-    try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      setOrders(data || [])
-    } catch (err) {
-      console.error('Error fetching orders:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     fetchOrders()
   }, [])
 
-  const updateStatus = async (id, newStatus) => {
+  const fetchOrders = async () => {
     try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('id', id)
+      setLoading(true)
+      setError(null)
       
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false })
+
       if (error) throw error
       
-      // Update local state to reflect change instantly
-      setOrders(orders.map(order => order.id === id ? { ...order, status: newStatus } : order))
+      // Ensure we set an array even if data comes back null
+      setOrders(data || [])
     } catch (err) {
-      console.error('Failed to update status:', err)
-      alert('Failed to update order status.')
+      console.error('Error fetching orders:', err)
+      setError(err.message || 'Failed to fetch orders from the database.')
+    } finally {
+      setLoading(false)
     }
   }
 
+  const updateStatus = async (id, newStatus) => {
+    try {
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('id', id)
+
+      if (updateError) throw updateError
+      
+      // Optimistic UI update for immediate feedback
+      setOrders(prevOrders => 
+        prevOrders?.map(order => 
+          order.id === id ? { ...order, status: newStatus } : order
+        )
+      )
+    } catch (err) {
+      alert('Failed to update order status: ' + err.message)
+    }
+  }
+
+  // 2. Loading State UI
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#1a1917] text-[#d4cebd] p-8 flex items-center justify-center font-sans">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#d4cebd]/20 border-t-[#c25134] rounded-full animate-spin"></div>
+          <p className="text-2xl font-serif font-bold italic opacity-80 tracking-wide text-[#d4cebd]">Loading dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // 3. Error State UI
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#1a1917] text-[#d4cebd] p-8 flex items-center justify-center font-sans">
+        <div className="bg-[#c25134]/10 border border-[#c25134]/40 p-8 rounded-3xl max-w-lg w-full text-center shadow-2xl">
+          <h2 className="text-3xl font-black font-serif text-[#c25134] mb-4">Connection Error</h2>
+          <p className="text-[#a09c91] font-medium leading-relaxed">{error}</p>
+          <button 
+            onClick={fetchOrders}
+            className="mt-8 bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-3 px-8 rounded-xl transition-all shadow-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // 4. Main Dashboard Render
   return (
-    <div className="w-full text-zinc-300 bg-zinc-950 font-sans p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#1a1917] text-[#d4cebd] p-4 sm:p-8 font-sans">
+      <div className="max-w-7xl mx-auto">
         
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 border-b border-[#d4cebd]/10 pb-6">
           <div>
-            <h1 className="text-3xl font-black text-white tracking-tight">Admin Portal</h1>
-            <p className="text-zinc-500 font-medium mt-1">Manage and update active student orders.</p>
+            <h1 className="text-4xl font-black font-serif text-[#d4cebd] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.5)]">
+              Admin Portal
+            </h1>
+            <p className="text-[#a09c91] font-medium mt-2">Manage incoming orders and delivery statuses.</p>
           </div>
           <button 
             onClick={fetchOrders}
-            className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-lg border border-zinc-800 transition-colors text-sm font-semibold"
+            className="bg-[#d4cebd]/10 hover:bg-[#d4cebd]/20 border border-[#d4cebd]/20 text-[#d4cebd] font-bold py-2.5 px-6 rounded-xl transition-all text-sm"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             Refresh Data
           </button>
         </div>
-
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-zinc-950 text-zinc-500 font-semibold uppercase tracking-wider text-xs">
+        
+        <div className="overflow-x-auto bg-[#1a1917] border border-[#d4cebd]/10 rounded-3xl shadow-2xl">
+          <table className="w-full text-left border-collapse min-w-max">
+            <thead className="bg-[#d4cebd] text-[#1a1917]">
+              <tr>
+                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Date</th>
+                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Student</th>
+                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Roll Number</th>
+                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Contact</th>
+                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Order Details</th>
+                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Total</th>
+                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Status</th>
+                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#d4cebd]/5">
+              
+              {orders?.length === 0 ? (
                 <tr>
-                  <th className="px-6 py-4">Student Info</th>
-                  <th className="px-6 py-4">Item Details</th>
-                  <th className="px-6 py-4">Total</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <td colSpan="8" className="py-16 text-center text-[#a09c91] font-medium text-lg">
+                    No orders found in the database.
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800">
-                {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-zinc-800/30 transition-colors">
+              ) : (
+                // 5. Safe Mapping using Optional Chaining
+                orders?.map((order) => (
+                  <tr key={order.id} className="hover:bg-[#d4cebd]/5 transition-colors">
                     
-                    <td className="px-6 py-4">
-                      <p className="text-white font-bold">{order.student_name}</p>
-                      <p className="text-zinc-400 font-mono text-xs mt-1">{order.roll_number}</p>
-                      <a href={`https://wa.me/${order.whatsapp_number?.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" className="text-blue-400 hover:text-blue-300 text-xs mt-1 block">
-                        {order.whatsapp_number}
-                      </a>
+                    <td className="py-5 px-6 text-sm text-[#a09c91] font-medium whitespace-nowrap">
+                      {new Date(order.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                     </td>
-
-                    <td className="px-6 py-4">
-                      <span className="inline-block px-2 py-1 bg-zinc-800 text-zinc-300 rounded text-xs font-bold mb-2">
-                        {order.item_type}
-                      </span>
-                      <p className="text-zinc-300 text-sm">{order.item_details}</p>
-                      {order.item_type === 'Print' && (
-                        <div className="text-xs text-zinc-500 mt-1 flex flex-col gap-0.5">
-                          <span>{order.print_type} • {order.sides} • {order.copies} Copies</span>
-                          <a href={order.document_url} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline inline-flex items-center gap-1 mt-1">
-                            <LinkIcon size={12} /> View Document
-                          </a>
-                        </div>
+                    
+                    <td className="py-5 px-6 font-bold text-white whitespace-nowrap">
+                      {order.student_name}
+                    </td>
+                    
+                    <td className="py-5 px-6 text-[#a09c91] font-medium tracking-wide">
+                      {order.roll_number}
+                    </td>
+                    
+                    <td className="py-5 px-6 text-sm font-medium">
+                      {order.whatsapp_number}
+                    </td>
+                    
+                    <td className="py-5 px-6 max-w-xs">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="bg-[#c25134]/20 text-[#c25134] border border-[#c25134]/30 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">
+                          {order.item_type}
+                        </span>
+                        {order.copies > 1 && (
+                          <span className="text-xs text-[#a09c91] font-bold">QTY: {order.copies}</span>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium text-[#d4cebd] truncate" title={order.item_details}>
+                        {order.item_details}
+                      </p>
+                      {order.document_url && (
+                        <a 
+                          href={order.document_url} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="inline-block text-[#c25134] text-xs font-bold mt-2 hover:underline hover:text-[#d4cebd] transition-colors"
+                        >
+                          View Document &rarr;
+                        </a>
                       )}
                     </td>
-
-                    <td className="px-6 py-4">
-                      <p className="text-white font-black text-lg">₹{order.total_price}</p>
+                    
+                    <td className="py-5 px-6 font-black font-serif text-[#c25134] text-lg">
+                      ₹{order.total_price}
                     </td>
-
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                        order.status === 'Completed' ? 'bg-green-500/10 text-green-400' :
-                        order.status === 'Printed' ? 'bg-orange-500/10 text-orange-400' :
-                        order.status === 'Accepted' ? 'bg-blue-500/10 text-blue-400' :
-                        'bg-zinc-800 text-zinc-400'
+                    
+                    <td className="py-5 px-6 whitespace-nowrap">
+                      <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
+                        order.status === 'Pending' ? 'bg-yellow-900/30 text-yellow-500 border-yellow-900/50' : 
+                        order.status === 'Completed' ? 'bg-green-900/30 text-green-500 border-green-900/50' : 
+                        order.status === 'Cancelled' ? 'bg-red-900/30 text-red-500 border-red-900/50' :
+                        'bg-blue-900/30 text-blue-400 border-blue-900/50'
                       }`}>
-                        {order.status}
+                        {order.status || 'Pending'}
                       </span>
                     </td>
-
-                    <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                      {order.status === 'Pending' && (
-                        <button onClick={() => updateStatus(order.id, 'Accepted')} className="inline-flex items-center justify-center p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors" title="Start Printing">
-                          <Printer size={16} />
-                        </button>
-                      )}
-                      {order.status === 'Accepted' && (
-                        <button onClick={() => updateStatus(order.id, 'Printed')} className="inline-flex items-center justify-center p-2 bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 rounded-lg transition-colors" title="Mark Out for Delivery">
-                          <Truck size={16} />
-                        </button>
-                      )}
-                      {order.status === 'Printed' && (
-                        <button onClick={() => updateStatus(order.id, 'Completed')} className="inline-flex items-center justify-center p-2 bg-green-500/10 text-green-400 hover:bg-green-500/20 rounded-lg transition-colors" title="Mark Completed">
-                          <Check size={16} />
-                        </button>
-                      )}
-                      {order.status !== 'Completed' && order.status !== 'Cancelled' && (
-                         <button onClick={() => updateStatus(order.id, 'Cancelled')} className="inline-flex items-center justify-center p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors" title="Cancel Order">
-                         <XCircle size={16} />
-                       </button>
-                      )}
-                    </td>
-
-                  </tr>
-                ))}
-                
-                {orders.length === 0 && !loading && (
-                  <tr>
-                    <td colSpan="5" className="px-6 py-12 text-center text-zinc-500">
-                      No orders found in the database.
+                    
+                    <td className="py-5 px-6 text-right whitespace-nowrap">
+                      <select 
+                        value={order.status || 'Pending'}
+                        onChange={(e) => updateStatus(order.id, e.target.value)}
+                        className="bg-[#1a1917] border border-[#d4cebd]/20 text-[#d4cebd] text-sm font-medium rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#c25134] cursor-pointer"
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Accepted">Accepted</option>
+                        <option value="Printed">Printed</option>
+                        <option value="Out for Delivery">Out for Delivery</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
+
       </div>
     </div>
   )
