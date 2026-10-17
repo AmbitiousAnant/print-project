@@ -30,14 +30,16 @@ export default function PrintPage() {
     }
   }
 
+  // --- UPDATED PRICING FORMULA (₹1.5 / page for B&W) ---
   const calculatedPrice = useMemo(() => {
     const p = parseInt(formData.pages) || 0;
     const c = parseInt(formData.copies) || 1;
     const totalPages = p * c;
     
-    if (totalPages < 20) return 0;
+    if (totalPages <= 0) return 0;
     
-    let price = formData.print_type === 'Color' ? (totalPages * 10) : (25 + ((totalPages - 20) * 1.5));
+    // ₹1.5 per page for B&W, ₹10 per page for Color
+    let price = formData.print_type === 'Color' ? (totalPages * 10) : (totalPages * 1.5);
     if (formData.sides === 'Double-Sided') price += 10;
     
     return price;
