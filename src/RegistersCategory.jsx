@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { User, FileText, Phone, ShoppingCart, ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { User, FileText, Phone, ShoppingCart, ArrowLeft, CheckCircle2, Plus, Minus } from 'lucide-react'
 import { useCart } from './CartContext'
 
 export default function RegistersCategory() {
@@ -14,6 +14,14 @@ export default function RegistersCategory() {
     whatsapp_number: ''
   })
 
+  // Quantity tracker per item id (default 1)
+  const [quantities, setQuantities] = useState({
+    1: 1,
+    2: 1,
+    3: 1,
+    4: 1
+  })
+
   const handleChange = (e) => {
     const { name, value } = e.target
     if (name === 'whatsapp_number') {
@@ -24,7 +32,14 @@ export default function RegistersCategory() {
     }
   }
 
-  const handleAddToCart = (model, price) => {
+  const handleQtyChange = (id, delta) => {
+    setQuantities(prev => ({
+      ...prev,
+      [id]: Math.max(1, (prev[id] || 1) + delta)
+    }))
+  }
+
+  const handleAddToCart = (item) => {
     setErrorMsg('')
     setSuccessMsg('')
     
@@ -34,42 +49,51 @@ export default function RegistersCategory() {
       return
     }
 
+    const qty = quantities[item.id] || 1
     const cartItem = {
       student_name: formData.student_name,
       roll_number: formData.roll_number,
       whatsapp_number: `+91${formData.whatsapp_number}`,
       item_type: 'Register',
-      item_details: model,
-      copies: 1, // Defaulting to 1 per click
-      total_price: price
+      item_details: `${item.model} (${qty} qty)`,
+      copies: qty,
+      total_price: item.price * qty
     }
 
     addToCart(cartItem)
-    setSuccessMsg(`${model} added to your cart!`)
+    setSuccessMsg(`${qty} × ${item.model} added to your cart!`)
     setTimeout(() => setSuccessMsg(''), 4000)
   }
 
+  // --- 4 REGISTER PRODUCTS (Update image paths when you have them) ---
   const registers = [
     {
       id: 1,
-      model: "Premium 4000-Page Spiral",
-      price: 180,
-      specs: "High GSM paper, durable spiral binding. Perfect for full-semester notes.",
-      image: "https://images.unsplash.com/photo-1531346878377-a541e4ab04ce?auto=format&fit=crop&w=800"
+      model: "Spiral Register (400 Pages)",
+      price: 140,
+      specs: "400 Pages. Heavy-duty spiral binding with thick, high-GSM paper. Ideal for full-semester notes.",
+      image: "400.webp" // Replace with your image
     },
     {
       id: 2,
-      model: "Standard Fair Register",
-      price: 60,
-      specs: "~200 Pages. High quality ruled paper for daily classwork.",
-      image: "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=800"
+      model: "Register White (200 Pages)",
+      price: 70,
+      specs: "200 Pages. Bright white, smooth ruled pages for clean assignments, projects & fair work.",
+      image: "200.jpg" // Replace with your image
     },
     {
       id: 3,
-      model: "Standard Rough Register",
+      model: "Register Yellow (200 Pages)",
       price: 50,
-      specs: "~200 Pages. Ideal for practice, calculations, and rough work.",
-      image: "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=800"
+      specs: "200 Pages. Classic yellow ruled sheets. High-value everyday notebook for classwork & practice.",
+      image: "201.jpg" // Replace with your image
+    },
+    {
+      id: 4,
+      model: "Thin Notebook / Copy",
+      price: 30,
+      specs: "Slim, lightweight copy. Perfect for quick labs, quizzes, tutorials & rough calculations.",
+      image: "40.png" // Replace with your image
     }
   ]
 
@@ -82,10 +106,10 @@ export default function RegistersCategory() {
         </Link>
 
         <h1 className="text-4xl lg:text-5xl font-black font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)] mb-8">
-          College Registers
+          College Registers & Notebooks
         </h1>
 
-        {/* Global Personal Details */}
+        {/* Global Personal Details (Required before adding to cart) */}
         <div className="bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-3xl p-8 mb-12">
           <h2 className="text-xl font-bold font-serif text-[#1a1917] mb-6 border-b border-black/10 pb-2">1. Verify Your Identity</h2>
           
@@ -121,31 +145,76 @@ export default function RegistersCategory() {
         </div>
 
         {/* Product Grid */}
-        <h2 className="text-xl font-bold font-serif text-[#1a1917] mb-6 border-b border-black/10 pb-2">2. Select a Model</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {registers.map(reg => (
-            <div key={reg.id} className="bg-[#cbc4b1] rounded-3xl overflow-hidden shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] flex flex-col">
-              <div className="h-56 bg-[#1a1917] overflow-hidden border-b border-black/10">
-                <img src={reg.image} alt={reg.model} className="w-full h-full object-cover grayscale contrast-125 mix-blend-multiply opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-700" />
-              </div>
-              <div className="p-6 flex flex-col flex-1">
-                <h3 className="text-xl font-bold font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">{reg.model}</h3>
-                <p className="text-[#5a5750] text-sm font-medium mt-2 flex-1">{reg.specs}</p>
-                <div className="mt-6 flex items-center justify-between">
-                  <span className="text-2xl font-black text-[#c25134] font-serif">₹{reg.price}</span>
+        <h2 className="text-xl font-bold font-serif text-[#1a1917] mb-6 border-b border-black/10 pb-2">2. Select Your Registers</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {registers.map(reg => {
+            const qty = quantities[reg.id] || 1
+            const totalPrice = reg.price * qty
+
+            return (
+              <div key={reg.id} className="bg-[#cbc4b1] rounded-3xl overflow-hidden shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] flex flex-col border border-black/5">
+                <div className="h-60 bg-[#1a1917] overflow-hidden border-b border-black/10">
+                  <img 
+                    src={reg.image} 
+                    alt={reg.model} 
+                    className="w-full h-full object-cover grayscale contrast-125 mix-blend-multiply opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-700" 
+                  />
+                </div>
+                <div className="p-7 flex flex-col flex-1">
+                  <div className="flex justify-between items-start gap-4">
+                    <h3 className="text-2xl font-bold font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.2),_1px_1px_1px_rgba(255,255,255,0.8)]">
+                      {reg.model}
+                    </h3>
+                  </div>
+                  <p className="text-[#5a5750] text-sm font-medium mt-2 flex-1 leading-relaxed">
+                    {reg.specs}
+                  </p>
+
+                  {/* Quantity & Price Row */}
+                  <div className="mt-6 pt-4 border-t border-black/10 flex items-center justify-between">
+                    <div>
+                      <span className="text-xs text-[#5a5750] font-bold uppercase tracking-wider block">Price</span>
+                      <span className="text-3xl font-black text-[#c25134] font-serif">₹{totalPrice}</span>
+                      {qty > 1 && (
+                        <span className="text-xs text-[#5a5750] font-medium ml-2">(₹{reg.price} each)</span>
+                      )}
+                    </div>
+
+                    {/* Quantity Selector */}
+                    <div className="flex items-center bg-[#d4cebd] rounded-xl p-1 shadow-inner border border-black/5">
+                      <button 
+                        type="button"
+                        onClick={() => handleQtyChange(reg.id, -1)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#cbc4b1] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] transition-all font-bold"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-10 text-center font-bold text-sm text-[#1a1917]">{qty}</span>
+                      <button 
+                        type="button"
+                        onClick={() => handleQtyChange(reg.id, 1)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#cbc4b1] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] transition-all font-bold"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Add to Cart Button */}
                   <button 
-                    onClick={() => handleAddToCart(reg.model, reg.price)}
-                    className="bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-2.5 px-5 rounded-xl transition-all flex items-center gap-2 shadow-lg text-sm"
+                    onClick={() => handleAddToCart(reg)}
+                    className="mt-6 w-full bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg tracking-wide"
                   >
-                    <ShoppingCart className="w-4 h-4" /> Add
+                    <ShoppingCart className="w-5 h-5" /> Add to Cart
                   </button>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
       </div>
     </div>
   )
-}
+}``
