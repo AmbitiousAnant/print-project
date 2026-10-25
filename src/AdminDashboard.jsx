@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './supabaseClient'
+import { CheckCircle2, Clock, IndianRupee, Users, RefreshCw, LogOut, Check, ExternalLink } from 'lucide-react'
 
 export default function AdminDashboard() {
   // --- Auth State ---
@@ -12,20 +13,21 @@ export default function AdminDashboard() {
   
   // --- Data State ---
   const [orders, setOrders] = useState([])
+  const [distributors, setDistributors] = useState([])
   const [dataLoading, setDataLoading] = useState(true)
   const [dataError, setDataError] = useState(null)
+  const [actionNotice, setActionNotice] = useState('')
+  const [payingId, setPayingId] = useState(null)
   
   const navigate = useNavigate()
 
   // 1. Session Initialization & Listener
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setAuthLoading(false)
     })
 
-    // Listen for auth changes (login/logout)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -36,29 +38,39 @@ export default function AdminDashboard() {
     return () => subscription.unsubscribe()
   }, [])
 
-  // 2. Fetch Orders (Only runs when session exists)
+  // 2. Fetch Orders & Distributors (Only runs when session exists)
   useEffect(() => {
     if (session) {
-      fetchOrders()
+      fetchAllData()
     }
   }, [session])
 
-  const fetchOrders = async () => {
+  const fetchAllData = async () => {
     try {
       setDataLoading(true)
       setDataError(null)
       
-      const { data, error } = await supabase
+      // Fetch orders
+      const { data: ordersData, error: ordersErr } = await supabase
         .from('orders')
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      
-      setOrders(data || [])
+      if (ordersErr) throw ordersErr
+      setOrders(ordersData || [])
+
+      // Fetch distributors
+      const { data: distData, error: distErr } = await supabase
+        .from('distributors')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (distErr) throw distErr
+      setDistributors(distData || [])
+
     } catch (err) {
-      console.error('Error fetching orders:', err)
-      setDataError(err.message || 'Failed to fetch orders from the database.')
+      console.error('Error fetching admin data:', err)
+      setDataError(err.message || 'Failed to fetch data from Supabase.')
     } finally {
       setDataLoading(false)
     }
@@ -91,8 +103,84 @@ export default function AdminDashboard() {
     }
   }
 
+  // --- ORDER STATUS UPDATE WITH AUTOMATIC COMMISSION CREDIT ---
   const updateStatus = async (id, newStatus) => {
+    setActionNotice('')
     try {
+      const order = orders.find(o => o.id === id)
+      const isCompleting = (newStatus || '').toUpperCase() === 'COMPLETED'
+
+      // Check if order qualifies for automatic commission payout
+      if (
+        isCompleting && 
+        order && 
+        order.referral_code && 
+        !order.commission_paid && 
+        (order.print_pages || 0) > 0
+      ) {
+        const orderPrintPages = Number(order.print_pages) || 0
+        const earned = Number(order.referral_commission) || (Math.floor(orderPrintPages / 20) * 5)
+
+        // 1. Fetch current distributor
+        const { data: distData, error: distFetchErr } = await supabase
+          .from('distributors')
+          .select('*')
+          .eq('referral_code', order.referral_code)
+          .maybeSingle()
+
+        if (distFetchErr) throw distFetchErr
+
+        if (distData) {
+          // 2. Increment distributor total pages and earnings
+          const newPages = (Number(distData.total_pages_referred) || 0) + orderPrintPages
+          const newPending = (Number(distData.pending_earnings) || 0) + earned
+          const newLifetime = (Number(distData.lifetime_earnings) || 0) + earned
+
+          const { error: distUpdateErr } = await supabase
+            .from('distributors')
+            .update({
+              total_pages_referred: newPages,
+              pending_earnings: newPending,
+              lifetime_earnings: newLifetime
+            })
+            .eq('id', distData.id)
+
+          if (distUpdateErr) throw distUpdateErr
+
+          // 3. Update local distributors state
+          setDistributors(prev =>
+            prev.map(d =>
+              d.id === distData.id
+                ? { ...d, total_pages_referred: newPages, pending_earnings: newPending, lifetime_earnings: newLifetime }
+                : d
+            )
+          )
+        }
+
+        // 4. Update order with commission_paid = true
+        const { error: updateOrderErr } = await supabase
+          .from('orders')
+          .update({
+            status: newStatus,
+            commission_paid: true
+          })
+          .eq('id', id)
+
+        if (updateOrderErr) throw updateOrderErr
+
+        // Optimistic order update
+        setOrders(prev =>
+          prev.map(o =>
+            o.id === id ? { ...o, status: newStatus, commission_paid: true } : o
+          )
+        )
+
+        setActionNotice(`✓ Order #${id.slice(0, 8)} marked Completed. Commission of ₹${earned} credited to distributor "${order.referral_code}"!`)
+        setTimeout(() => setActionNotice(''), 6000)
+        return
+      }
+
+      // Standard status update (no referral commission needed or already paid)
       const { error: updateError } = await supabase
         .from('orders')
         .update({ status: newStatus })
@@ -100,14 +188,49 @@ export default function AdminDashboard() {
 
       if (updateError) throw updateError
       
-      // Optimistic UI update
-      setOrders(prevOrders => 
-        prevOrders?.map(order => 
-          order.id === id ? { ...order, status: newStatus } : order
+      setOrders(prev => 
+        prev?.map(o => 
+          o.id === id ? { ...o, status: newStatus } : o
         )
       )
     } catch (err) {
       alert('Failed to update order status: ' + err.message)
+    }
+  }
+
+  // --- MARK DISTRIBUTOR PAID / RESET PENDING EARNINGS ---
+  const handleMarkPaid = async (distributor) => {
+    const pending = Number(distributor.pending_earnings) || 0
+    if (pending <= 0) {
+      alert('This distributor has no pending balance to settle.')
+      return
+    }
+
+    const confirmPay = window.confirm(
+      `Mark ₹${pending} as PAID to ${distributor.owner_name} (${distributor.owner_roll_no})?\n\nThis will reset their Unpaid Balance to ₹0 while preserving their Lifetime Earnings (₹${distributor.lifetime_earnings || 0}).`
+    )
+
+    if (!confirmPay) return
+
+    setPayingId(distributor.id)
+    try {
+      const { error } = await supabase
+        .from('distributors')
+        .update({ pending_earnings: 0 })
+        .eq('id', distributor.id)
+
+      if (error) throw error
+
+      setDistributors(prev =>
+        prev.map(d => (d.id === distributor.id ? { ...d, pending_earnings: 0 } : d))
+      )
+
+      setActionNotice(`✓ Payout recorded: Unpaid balance for ${distributor.owner_name} (${distributor.referral_code}) has been reset to ₹0. Lifetime earnings preserved.`)
+      setTimeout(() => setActionNotice(''), 6000)
+    } catch (err) {
+      alert('Failed to reset pending balance: ' + err.message)
+    } finally {
+      setPayingId(null)
     }
   }
 
@@ -180,7 +303,7 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-[#1a1917] text-[#d4cebd] p-8 flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-[#d4cebd]/20 border-t-[#c25134] rounded-full animate-spin"></div>
-          <p className="text-2xl font-serif font-bold italic opacity-80 tracking-wide text-[#d4cebd]">Loading dashboard...</p>
+          <p className="text-2xl font-serif font-bold italic opacity-80 tracking-wide text-[#d4cebd]">Loading dashboard & partner data...</p>
         </div>
       </div>
     )
@@ -194,7 +317,7 @@ export default function AdminDashboard() {
           <h2 className="text-3xl font-black font-serif text-[#c25134] mb-4">Connection Error</h2>
           <p className="text-[#a09c91] font-medium leading-relaxed">{dataError}</p>
           <button 
-            onClick={fetchOrders}
+            onClick={fetchAllData}
             className="mt-8 bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-3 px-8 rounded-xl transition-all shadow-lg"
           >
             Try Again
@@ -204,7 +327,7 @@ export default function AdminDashboard() {
     )
   }
 
-  // --- Prepare Data for Main Render ---
+  // --- Filter Orders ---
   const activeOrders = orders?.filter(order => {
     const s = (order.status || '').toUpperCase()
     return s !== 'COMPLETED' && s !== 'REJECTED'
@@ -215,34 +338,34 @@ export default function AdminDashboard() {
     return s === 'COMPLETED' || s === 'REJECTED'
   }) || []
 
-  // Helper function to render tables cleanly
+  // Helper function to render orders tables
   const renderOrderTable = (title, dataList) => {
     return (
-      <div className="mb-16">
-        <h2 className="text-3xl font-black font-serif text-[#d4cebd] mb-6 border-b border-[#d4cebd]/10 pb-4 [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.5)]">
-          {title} <span className="text-lg font-medium text-[#a09c91] ml-3">({dataList.length})</span>
+      <div className="mb-14">
+        <h2 className="text-2xl font-black font-serif text-[#d4cebd] mb-5 border-b border-[#d4cebd]/10 pb-3 [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.5)]">
+          {title} <span className="text-base font-medium text-[#a09c91] ml-2">({dataList.length})</span>
         </h2>
         
         <div className="overflow-x-auto bg-[#1a1917] border border-[#d4cebd]/10 rounded-3xl shadow-2xl">
           <table className="w-full text-left border-collapse min-w-max">
             <thead className="bg-[#d4cebd] text-[#1a1917]">
               <tr>
-                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">S.NO.</th>
-                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Date</th>
-                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Student</th>
-                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Roll Number</th>
-                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Contact</th>
-                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Order Details</th>
-                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Total</th>
-                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs">Status</th>
-                <th className="py-4 px-6 font-black uppercase tracking-wider text-xs text-right">Actions</th>
+                <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">S.NO.</th>
+                <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Date</th>
+                <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Student</th>
+                <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Roll No</th>
+                <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Contact</th>
+                <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Order & Referral</th>
+                <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Total</th>
+                <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Status</th>
+                <th className="py-4 px-5 font-black uppercase tracking-wider text-xs text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#d4cebd]/5">
               
               {dataList.length === 0 ? (
                 <tr>
-                  <td colSpan="9" className="py-16 text-center text-[#a09c91] font-medium text-lg">
+                  <td colSpan="9" className="py-12 text-center text-[#a09c91] font-medium text-base">
                     No orders found in this section.
                   </td>
                 </tr>
@@ -250,7 +373,6 @@ export default function AdminDashboard() {
                 dataList.map((order, index) => {
                   const s = (order.status || 'Pending').toUpperCase()
                   
-                  // Brand color determination for badges
                   let badgeStyle = 'bg-blue-900/30 text-blue-400 border-blue-900/50'
                   if (s === 'PENDING') badgeStyle = 'bg-yellow-900/30 text-yellow-500 border-yellow-900/50'
                   else if (s === 'COMPLETED') badgeStyle = 'bg-green-900/30 text-green-500 border-green-900/50'
@@ -258,63 +380,80 @@ export default function AdminDashboard() {
 
                   return (
                     <tr key={order.id} className="hover:bg-[#d4cebd]/5 transition-colors">
-                      <td className="py-5 px-6 font-bold text-[#a09c91]">{index + 1}</td>
+                      <td className="py-4 px-5 font-bold text-[#a09c91] text-xs">{index + 1}</td>
                       
-                      <td className="py-5 px-6 text-sm text-[#a09c91] font-medium whitespace-nowrap">
+                      <td className="py-4 px-5 text-xs text-[#a09c91] font-medium whitespace-nowrap">
                         {new Date(order.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                       </td>
                       
-                      <td className="py-5 px-6 font-bold text-white whitespace-nowrap">
+                      <td className="py-4 px-5 font-bold text-white text-sm whitespace-nowrap">
                         {order.student_name}
                       </td>
                       
-                      <td className="py-5 px-6 text-[#a09c91] font-medium tracking-wide">
+                      <td className="py-4 px-5 text-[#a09c91] font-medium text-xs tracking-wide">
                         {order.roll_number}
                       </td>
                       
-                      <td className="py-5 px-6 text-sm font-medium">
-                        {order.whatsapp_number}
+                      <td className="py-4 px-5 text-xs font-medium whitespace-nowrap">
+                        <a href={`https://wa.me/${order.whatsapp_number?.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="text-[#d4cebd] hover:underline">
+                          {order.whatsapp_number}
+                        </a>
                       </td>
                       
-                      <td className="py-5 px-6 max-w-xs">
-                        <div className="flex flex-wrap items-center gap-2 mb-1">
-                          <span className="bg-[#c25134]/20 text-[#c25134] border border-[#c25134]/30 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">
+                      <td className="py-4 px-5 max-w-xs">
+                        <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                          <span className="bg-[#c25134]/20 text-[#c25134] border border-[#c25134]/30 px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider">
                             {order.item_type}
                           </span>
-                          {order.copies > 1 && (
-                            <span className="text-xs text-[#a09c91] font-bold">QTY: {order.copies}</span>
+                          {order.print_pages > 0 && (
+                            <span className="text-[11px] text-[#a09c91] font-bold">{order.print_pages} pgs</span>
                           )}
                         </div>
-                        <p className="text-sm font-medium text-[#d4cebd] truncate" title={order.item_details}>
+                        <p className="text-xs font-medium text-[#d4cebd] truncate" title={order.item_details}>
                           {order.item_details}
                         </p>
+                        
+                        {/* Referral Badge */}
+                        {order.referral_code && (
+                          <div className="mt-1.5 flex items-center gap-1 text-[11px]">
+                            <span className="bg-purple-900/30 text-purple-300 border border-purple-800/40 px-1.5 py-0.5 rounded font-mono font-bold">
+                              🎟️ {order.referral_code}
+                            </span>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                              order.commission_paid ? 'bg-green-950 text-green-400' : 'bg-yellow-950 text-yellow-400'
+                            }`}>
+                              {order.commission_paid ? 'Paid' : `₹${order.referral_commission || 0} Unpaid`}
+                            </span>
+                          </div>
+                        )}
+
                         {order.document_url && (
                           <a 
                             href={order.document_url} 
                             target="_blank" 
                             rel="noreferrer" 
-                            className="inline-block text-[#c25134] text-xs font-bold mt-2 hover:underline hover:text-[#d4cebd] transition-colors"
+                            className="inline-block text-[#c25134] text-xs font-bold mt-1.5 hover:underline transition-colors"
                           >
                             View Document &rarr;
                           </a>
                         )}
                       </td>
                       
-                      <td className="py-5 px-6 font-black font-serif text-[#c25134] text-lg">
+                      <td className="py-4 px-5 font-black font-serif text-[#c25134] text-base">
                         ₹{order.total_price}
                       </td>
                       
-                      <td className="py-5 px-6 whitespace-nowrap">
-                        <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${badgeStyle}`}>
+                      <td className="py-4 px-5 whitespace-nowrap">
+                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${badgeStyle}`}>
                           {order.status || 'Pending'}
                         </span>
                       </td>
                       
-                      <td className="py-5 px-6 text-right whitespace-nowrap">
+                      <td className="py-4 px-5 text-right whitespace-nowrap">
                         <select 
                           value={order.status || 'Pending'}
                           onChange={(e) => updateStatus(order.id, e.target.value)}
-                          className="bg-[#1a1917] border border-[#d4cebd]/20 text-[#d4cebd] text-sm font-medium rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#c25134] cursor-pointer"
+                          className="bg-[#1a1917] border border-[#d4cebd]/20 text-[#d4cebd] text-xs font-medium rounded-xl px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-[#c25134] cursor-pointer"
                         >
                           <option value="Pending">Pending</option>
                           <option value="Accepted">Accepted</option>
@@ -341,34 +480,138 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto">
         
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 border-b border-[#d4cebd]/10 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-[#d4cebd]/10 pb-6">
           <div>
-            <h1 className="text-4xl md:text-5xl font-black font-serif text-[#d4cebd] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.5)]">
+            <h1 className="text-4xl font-black font-serif text-[#d4cebd] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.5)]">
               Admin Portal
             </h1>
-            <p className="text-[#a09c91] font-medium mt-2">Manage incoming orders and delivery statuses.</p>
+            <p className="text-[#a09c91] font-medium mt-1 text-sm">
+              Manage incoming orders, referral distributions, and payouts.
+            </p>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button 
-              onClick={fetchOrders}
-              className="bg-[#d4cebd]/10 hover:bg-[#d4cebd]/20 border border-[#d4cebd]/20 text-[#d4cebd] font-bold py-3 px-6 rounded-xl transition-all text-sm shadow-sm"
+              onClick={fetchAllData}
+              className="bg-[#d4cebd]/10 hover:bg-[#d4cebd]/20 border border-[#d4cebd]/20 text-[#d4cebd] font-bold py-2.5 px-5 rounded-xl transition-all text-xs flex items-center gap-1.5 shadow-sm"
             >
-              Refresh Data
+              <RefreshCw className="w-3.5 h-3.5" /> Refresh Data
             </button>
             <button 
               onClick={handleLogout}
-              className="bg-[#c25134] hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition-all text-sm shadow-lg shadow-black/20"
+              className="bg-[#c25134] hover:bg-red-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-xs flex items-center gap-1.5 shadow-lg shadow-black/20"
             >
-              Logout
+              <LogOut className="w-3.5 h-3.5" /> Logout
             </button>
           </div>
         </div>
 
-        {/* Active Orders Section */}
+        {/* Action Notice Alert */}
+        {actionNotice && (
+          <div className="mb-8 p-4 bg-green-900/20 border border-green-700/40 rounded-2xl text-green-400 font-bold text-sm flex items-center gap-2 shadow-lg animate-in fade-in duration-300">
+            <CheckCircle2 className="w-5 h-5 shrink-0" />
+            <span>{actionNotice}</span>
+          </div>
+        )}
+
+        {/* SECTION 1: CAMPUS DISTRIBUTORS (X/75) */}
+        <div className="mb-14">
+          <div className="flex items-center justify-between mb-5 border-b border-[#d4cebd]/10 pb-3">
+            <div className="flex items-center gap-3">
+              <Users className="w-6 h-6 text-[#c25134]" />
+              <h2 className="text-2xl font-black font-serif text-[#d4cebd] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.5)]">
+                Campus Distributors
+              </h2>
+            </div>
+            <span className="bg-[#c25134]/20 text-[#c25134] border border-[#c25134]/30 px-3 py-1 rounded-full text-xs font-bold font-mono">
+              {distributors.length} / 75 Registered
+            </span>
+          </div>
+
+          <div className="overflow-x-auto bg-[#1a1917] border border-[#d4cebd]/10 rounded-3xl shadow-2xl">
+            <table className="w-full text-left border-collapse min-w-max">
+              <thead className="bg-[#d4cebd] text-[#1a1917]">
+                <tr>
+                  <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">S.NO.</th>
+                  <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Partner Name</th>
+                  <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Roll No</th>
+                  <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">WhatsApp Contact</th>
+                  <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Referral Code</th>
+                  <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Pages Ref.</th>
+                  <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Unpaid Balance (₹)</th>
+                  <th className="py-4 px-5 font-black uppercase tracking-wider text-xs">Lifetime Earned (₹)</th>
+                  <th className="py-4 px-5 font-black uppercase tracking-wider text-xs text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#d4cebd]/5">
+                {distributors.length === 0 ? (
+                  <tr>
+                    <td colSpan="9" className="py-12 text-center text-[#a09c91] font-medium text-base">
+                      No campus distributors registered yet.
+                    </td>
+                  </tr>
+                ) : (
+                  distributors.map((dist, idx) => {
+                    const pending = Number(dist.pending_earnings) || 0
+                    const lifetime = Number(dist.lifetime_earnings) || 0
+
+                    return (
+                      <tr key={dist.id} className="hover:bg-[#d4cebd]/5 transition-colors">
+                        <td className="py-4 px-5 font-bold text-[#a09c91] text-xs">{idx + 1}</td>
+                        <td className="py-4 px-5 font-bold text-white text-sm">{dist.owner_name}</td>
+                        <td className="py-4 px-5 text-xs text-[#a09c91] font-mono">{dist.owner_roll_no}</td>
+                        <td className="py-4 px-5 text-xs">
+                          <a
+                            href={`https://wa.me/${dist.owner_contact?.replace(/\D/g, '')}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[#d4cebd] hover:underline flex items-center gap-1 font-medium"
+                          >
+                            {dist.owner_contact} <ExternalLink className="w-3 h-3 text-[#a09c91]" />
+                          </a>
+                        </td>
+                        <td className="py-4 px-5 font-mono font-black text-[#c25134] text-sm tracking-wider">
+                          {dist.referral_code}
+                        </td>
+                        <td className="py-4 px-5 font-bold text-white text-sm">
+                          {dist.total_pages_referred || 0}
+                        </td>
+                        <td className="py-4 px-5">
+                          <span className={`font-black font-serif text-base ${pending > 0 ? 'text-yellow-400 font-bold' : 'text-[#a09c91]'}`}>
+                            ₹{pending}
+                          </span>
+                        </td>
+                        <td className="py-4 px-5 font-black font-serif text-green-400 text-base">
+                          ₹{lifetime}
+                        </td>
+                        <td className="py-4 px-5 text-right whitespace-nowrap">
+                          {pending > 0 ? (
+                            <button
+                              onClick={() => handleMarkPaid(dist)}
+                              disabled={payingId === dist.id}
+                              className="bg-green-700 hover:bg-green-600 text-white font-bold text-xs py-1.5 px-3 rounded-lg transition-all shadow-md disabled:opacity-50"
+                            >
+                              {payingId === dist.id ? 'Processing...' : `Mark Paid (₹${pending})`}
+                            </button>
+                          ) : (
+                            <span className="text-[11px] text-[#a09c91] font-medium bg-white/5 py-1 px-2.5 rounded-lg border border-white/5">
+                              ✓ All Settled
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* SECTION 2: ACTIVE ORDERS */}
         {renderOrderTable("Active Orders", activeOrders)}
 
-        {/* Order History Section */}
+        {/* SECTION 3: ORDER HISTORY */}
         {renderOrderTable("Order History", historyOrders)}
 
       </div>

@@ -7,7 +7,9 @@ import RegistersCategory from './RegistersCategory'
 import Cart from './Cart'
 import TrackOrder from './TrackOrder'
 import AdminDashboard from './AdminDashboard'
-import AboutUs from './AboutUs' // <-- Added import for About Us
+import AboutUs from './AboutUs'
+import PartnerPortal from './PartnerPortal'
+import PromoBanner from './PromoBanner'
 import { Printer, MessageCircle, Linkedin, ShoppingCart } from 'lucide-react'
 import { Analytics } from "@vercel/analytics/react"
 import { CartProvider, useCart } from './CartContext'
@@ -24,12 +26,14 @@ function Navbar() {
           </div>
           <span className="font-semibold text-lg tracking-tight">Print Studio</span>
         </Link>
-        <div className="flex items-center gap-6">
-          {/* NEW ABOUT US LINK */}
-          <Link to="/about" className="text-sm text-[#d4cebd] hover:text-white transition-colors font-medium">
+        <div className="flex items-center gap-4 sm:gap-6">
+          <Link to="/partner" className="text-xs sm:text-sm font-bold text-[#c25134] hover:text-white transition-colors bg-[#c25134]/15 px-2.5 py-1 rounded-lg border border-[#c25134]/30">
+            Earn ₹ / Partner
+          </Link>
+          <Link to="/about" className="text-xs sm:text-sm text-[#d4cebd] hover:text-white transition-colors font-medium hidden sm:inline">
             About Us
           </Link>
-          <Link to="/track" className="text-sm text-[#d4cebd] hover:text-white transition-colors font-medium">
+          <Link to="/track" className="text-xs sm:text-sm text-[#d4cebd] hover:text-white transition-colors font-medium">
             Track Order
           </Link>
           <Link to="/cart" className="relative text-[#d4cebd] hover:text-white transition-colors flex items-center gap-1">
@@ -40,7 +44,7 @@ function Navbar() {
               </span>
             )}
           </Link>
-          <Link to="/admin" className="text-sm text-[#d4cebd] hover:text-white transition-colors font-medium">
+          <Link to="/admin" className="text-xs sm:text-sm text-[#d4cebd] hover:text-white transition-colors font-medium">
             Admin
           </Link>
         </div>
@@ -53,7 +57,7 @@ function App() {
   return (
     <CartProvider>
       <Router>
-        <div className="min-h-screen bg-[#1a1917] text-[#d4cebd] font-sans flex flex-col">
+        <div className="min-h-screen bg-[#1a1917] text-[#d4cebd] font-sans flex flex-col relative">
           <Navbar />
           <main className="flex-1 flex flex-col w-full">
             <Routes>
@@ -64,10 +68,13 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/track" element={<TrackOrder />} />
               <Route path="/admin" element={<AdminDashboard />} />
-              {/* NEW ABOUT US ROUTE */}
               <Route path="/about" element={<AboutUs />} />
+              <Route path="/partner" element={<PartnerPortal />} />
             </Routes>
           </main>
+
+          {/* Floating Partner Promo Banner */}
+          <PromoBanner />
 
           <footer className="border-t border-[#d4cebd]/10 bg-[#1a1917] py-10 text-sm text-[#a09c91] w-full mt-auto">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

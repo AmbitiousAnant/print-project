@@ -62,6 +62,8 @@ export default function PrintPage() {
       return;
     }
 
+    const printPagesTotal = (parseInt(formData.pages) || 0) * (parseInt(formData.copies) || 1)
+
     const cartItem = {
       student_name: formData.student_name,
       roll_number: formData.roll_number,
@@ -72,6 +74,7 @@ export default function PrintPage() {
       print_type: formData.print_type,
       sides: formData.sides,
       copies: parseInt(formData.copies),
+      print_pages: printPagesTotal,
       item_details: `${formData.pages} Pages`
     }
 
