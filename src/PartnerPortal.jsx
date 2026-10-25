@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import { 
   ArrowLeft, User, FileText, Phone, Sparkles, Copy, Check, 
-  Share2, IndianRupee, Layers, Clock, AlertCircle, CheckCircle2 
+  Share2, IndianRupee, Layers, Clock, AlertCircle, CheckCircle2, MessageCircle 
 } from 'lucide-react'
+
+// Replace with your personal WhatsApp number if you prefer a different admin line
+const ADMIN_WHATSAPP_NUMBER = '917982350793'
 
 export default function PartnerPortal() {
   // Live spots count
@@ -22,8 +25,9 @@ export default function PartnerPortal() {
   const [generatedPartner, setGeneratedPartner] = useState(null)
   const [copiedCode, setCopiedCode] = useState(false)
 
-  // Section B: Earnings tracker state
+  // Section B: Two-Factor Earnings tracker state
   const [trackCode, setTrackCode] = useState('')
+  const [trackPhone, setTrackPhone] = useState('')
   const [trackLoading, setTrackLoading] = useState(false)
   const [trackError, setTrackError] = useState('')
   const [partnerStats, setPartnerStats] = useState(null)
@@ -52,14 +56,12 @@ export default function PartnerPortal() {
 
   // --- 6-Character Code Generator ---
   const generateUniqueCode = async (fullName) => {
-    // 1. First name letters only
     const firstName = fullName.trim().split(' ')[0].replace(/[^a-zA-Z]/g, '').toUpperCase()
     let prefix = firstName.slice(0, 4)
     while (prefix.length < 4) {
       prefix += 'X'
     }
 
-    // 2. Loop to guarantee uniqueness against database
     let code = ''
     let isUnique = false
     let attempts = 0
@@ -83,11 +85,17 @@ export default function PartnerPortal() {
     return code
   }
 
-  // --- WhatsApp Share Function ---
-  const handleWhatsAppShare = (code) => {
+  // --- One-Click Promotional WhatsApp Share ---
+  const handlePromoteOnWhatsApp = (code) => {
     const siteUrl = window.location.origin
     const shareText = `📄 *Need Lab Manuals, Assignments, or Calculators?*\nSkip the print shop queue and get the cheapest prints on campus delivered hand-to-hand via *Print Studio*! 🚀\n\n🎟️ Use my code *${code}* at checkout:\n🔗 ${siteUrl}`
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank')
+  }
+
+  // --- Direct WhatsApp Claim Payout ---
+  const handleClaimPayout = (partner) => {
+    const claimText = `Hi Print Studio Admin! 👋\nI would like to claim my distributor earnings.\n\n👤 *Name:* ${partner.owner_name}\n🎓 *Roll No:* ${partner.owner_roll_no}\n🎟️ *Referral Code:* ${partner.referral_code}\n📄 *Total Pages Referred:* ${partner.total_pages_referred || 0}\n💰 *Unpaid Balance to Claim:* ₹${partner.pending_earnings || 0}`
+    window.open(`https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(claimText)}`, '_blank')
   }
 
   // --- Copy Code to Clipboard ---
@@ -185,15 +193,22 @@ export default function PartnerPortal() {
     }
   }
 
-  // --- Earnings Tracker Handler ---
+  // --- Two-Factor Earnings Tracker Handler (Code + Phone) ---
   const handleTrackEarnings = async (e) => {
     e.preventDefault()
     setTrackError('')
     setPartnerStats(null)
 
-    const normalizedCode = trackCode.trim().toUpperCase()
-    if (!normalizedCode || normalizedCode.length !== 6) {
+    const cleanCode = trackCode.trim().toUpperCase()
+    const cleanPhone = trackPhone.replace(/\D/g, '')
+
+    if (!cleanCode || cleanCode.length !== 6) {
       setTrackError('Please enter a valid 6-character referral code (e.g., ANAN48).')
+      return
+    }
+
+    if (cleanPhone.length !== 10) {
+      setTrackError('Please enter your registered 10-digit phone number.')
       return
     }
 
@@ -202,19 +217,27 @@ export default function PartnerPortal() {
       const { data, error } = await supabase
         .from('distributors')
         .select('*')
-        .eq('referral_code', normalizedCode)
+        .eq('referral_code', cleanCode)
         .maybeSingle()
 
       if (error) throw error
 
+      // Verify BOTH code and phone number combination for privacy
       if (!data) {
-        setTrackError(`No campus distributor found matching code "${normalizedCode}". Please verify your code.`)
-      } else {
-        setPartnerStats(data)
+        setTrackError('Invalid code or phone number combination.')
+        return
       }
+
+      const storedPhoneDigits = (data.owner_contact || '').replace(/\D/g, '')
+      if (!storedPhoneDigits.endsWith(cleanPhone)) {
+        setTrackError('Invalid code or phone number combination.')
+        return
+      }
+
+      setPartnerStats(data)
     } catch (err) {
       console.error(err)
-      setTrackError(err.message || 'Error fetching partner stats.')
+      setTrackError('Error verifying earnings lookup. Please try again.')
     } finally {
       setTrackLoading(false)
     }
@@ -295,7 +318,7 @@ export default function PartnerPortal() {
 
                 <div className="text-center py-2">
                   <p className="text-xs text-[#a09c91] uppercase tracking-wider font-bold">Your Unique Code</p>
-                  <p className="text-4xl font-mono font-black text-white tracking-widest mt-1 text-[#c25134] bg-white/5 py-2 px-4 rounded-xl inline-block border border-white/10">
+                  <p className="text-4xl font-mono font-black tracking-widest mt-1 text-[#c25134] bg-white/5 py-2 px-4 rounded-xl inline-block border border-white/10">
                     {generatedPartner.referral_code}
                   </p>
                   <p className="text-xs text-[#a09c91] mt-2 font-medium">Registered to: <strong className="text-white">{generatedPartner.owner_name}</strong> ({generatedPartner.owner_roll_no})</p>
@@ -312,10 +335,10 @@ export default function PartnerPortal() {
                   </button>
 
                   <button
-                    onClick={() => handleWhatsAppShare(generatedPartner.referral_code)}
+                    onClick={() => handlePromoteOnWhatsApp(generatedPartner.referral_code)}
                     className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg tracking-wide"
                   >
-                    <Share2 className="w-4 h-4" /> Share on WhatsApp
+                    <Share2 className="w-4 h-4" /> Promote on WhatsApp
                   </button>
                 </div>
 
@@ -399,7 +422,7 @@ export default function PartnerPortal() {
             )}
           </div>
 
-          {/* SECTION B: LIVE EARNINGS TRACKER */}
+          {/* SECTION B: TWO-FACTOR LIVE EARNINGS TRACKER (CODE + PHONE) */}
           <div className="bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-3xl p-8 sm:p-10 border border-black/5">
             <div className="border-b border-black/10 pb-4 mb-6">
               <span className="text-xs font-bold uppercase tracking-wider text-[#c25134]">Step 2</span>
@@ -407,32 +430,54 @@ export default function PartnerPortal() {
                 Live Earnings Tracker
               </h2>
               <p className="text-[#5a5750] text-sm font-medium mt-1">
-                Already have a code? Track your pages referred & unpaid balance.
+                Enter your 6-char code and registered contact number to verify and check your balance.
               </p>
             </div>
 
             <form onSubmit={handleTrackEarnings} className="space-y-4 mb-6">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#3a3832] uppercase tracking-wider">Your 6-Character Code</label>
-                <div className="flex gap-2">
+                <label className="text-xs font-bold text-[#3a3832] uppercase tracking-wider">6-Character Referral Code</label>
+                <input
+                  required
+                  type="text"
+                  maxLength="6"
+                  value={trackCode}
+                  onChange={(e) => setTrackCode(e.target.value.toUpperCase())}
+                  className="w-full bg-[#d4cebd] border-none rounded-xl py-3 px-4 font-mono font-bold text-base focus:ring-2 focus:ring-[#c25134] outline-none shadow-sm uppercase placeholder:font-sans placeholder:font-normal placeholder:text-sm"
+                  placeholder="e.g. ANAN48"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[#3a3832] uppercase tracking-wider">Registered 10-Digit Contact Number</label>
+                <div className="flex items-stretch bg-[#d4cebd] rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#c25134] shadow-sm">
+                  <div className="flex items-center pl-3.5 pr-2.5 border-r border-black/10">
+                    <Phone className="h-4 w-4 text-[#1a1917]/50 mr-1.5" />
+                    <span className="text-[#1a1917] font-bold text-sm">+91</span>
+                  </div>
                   <input
                     required
-                    type="text"
-                    maxLength="6"
-                    value={trackCode}
-                    onChange={(e) => setTrackCode(e.target.value.toUpperCase())}
-                    className="flex-1 bg-[#d4cebd] border-none rounded-xl py-3 px-4 font-mono font-bold text-base focus:ring-2 focus:ring-[#c25134] outline-none shadow-sm uppercase placeholder:font-sans placeholder:font-normal placeholder:text-sm"
-                    placeholder="e.g. ANAN48"
+                    type="tel"
+                    pattern="[0-9]{10}"
+                    maxLength="10"
+                    value={trackPhone}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, '')
+                      if (digits.length <= 10) setTrackPhone(digits)
+                    }}
+                    className="w-full bg-transparent border-none py-3 px-3 font-medium text-sm focus:outline-none"
+                    placeholder="9876543210"
                   />
-                  <button
-                    type="submit"
-                    disabled={trackLoading}
-                    className="bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-3 px-5 rounded-xl transition-all shadow-md text-sm whitespace-nowrap disabled:opacity-50"
-                  >
-                    {trackLoading ? 'Checking...' : 'Track'}
-                  </button>
                 </div>
               </div>
+
+              <button
+                type="submit"
+                disabled={trackLoading}
+                className="w-full bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-3.5 px-5 rounded-xl transition-all shadow-md text-sm whitespace-nowrap disabled:opacity-50"
+              >
+                {trackLoading ? 'Verifying...' : 'Verify & Track Earnings'}
+              </button>
             </form>
 
             {trackError && (
@@ -450,7 +495,7 @@ export default function PartnerPortal() {
                     <p className="text-xs text-[#a09c91]">Roll No: {partnerStats.owner_roll_no} • Code: <strong className="text-[#c25134] font-mono">{partnerStats.referral_code}</strong></p>
                   </div>
                   <span className="text-xs bg-green-900/30 text-green-400 border border-green-900/50 px-2.5 py-1 rounded-full font-bold uppercase">
-                    Active
+                    Verified
                   </span>
                 </div>
 
@@ -475,17 +520,29 @@ export default function PartnerPortal() {
                   </div>
                 </div>
 
-                <div className="bg-white/5 p-3 rounded-xl border border-white/5 text-xs text-[#a09c91] leading-relaxed">
-                  💡 <strong className="text-[#d4cebd]">Payout Rule:</strong> Earn ₹5 for every 20 pages printed. Unpaid balances are settled directly via UPI to your WhatsApp number.
+                {/* CLAIM PAYOUT VIA WHATSAPP BUTTON */}
+                <div className="pt-1">
+                  {Number(partnerStats.pending_earnings) > 0 ? (
+                    <button
+                      onClick={() => handleClaimPayout(partnerStats)}
+                      className="w-full bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg tracking-wide"
+                    >
+                      <MessageCircle className="w-4 h-4" /> Claim Payout via WhatsApp (₹{partnerStats.pending_earnings})
+                    </button>
+                  ) : (
+                    <div className="w-full bg-white/5 text-[#a09c91] font-bold py-3 px-4 rounded-xl text-center text-xs border border-white/5">
+                      ✓ No Unpaid Balance to Claim (₹0 Pending)
+                    </div>
+                  )}
                 </div>
 
-                {/* SHARE ON WHATSAPP & COPY BUTTONS FOR RETURNING PARTNERS */}
-                <div className="space-y-2 pt-1 border-t border-[#d4cebd]/10">
+                {/* PROMOTE ON WHATSAPP & COPY CODE BUTTONS */}
+                <div className="space-y-2 pt-2 border-t border-[#d4cebd]/10">
                   <button
-                    onClick={() => handleWhatsAppShare(partnerStats.referral_code)}
+                    onClick={() => handlePromoteOnWhatsApp(partnerStats.referral_code)}
                     className="w-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg tracking-wide"
                   >
-                    <Share2 className="w-4 h-4" /> Share on WhatsApp
+                    <Share2 className="w-4 h-4" /> Promote on WhatsApp
                   </button>
 
                   <button
