@@ -93,7 +93,7 @@ export default function RegistersCategory() {
       model: "Thin Notebook / Copy",
       price: 30,
       specs: "Slim, lightweight copy. Perfect for quick labs, quizzes, tutorials & rough calculations.",
-      image: "40.png" // Replace with your image
+      image: "40.png" // Replace with your imag
     }
   ]
 
