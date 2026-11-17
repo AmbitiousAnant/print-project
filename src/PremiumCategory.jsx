@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { 
   User, FileText, Phone, ShoppingCart, ArrowLeft, CheckCircle2, 
   Sparkles, MessageCircle, Search, ShieldCheck, Check, Plus, Minus,
-  ArrowUpRight, Award, Droplets, Leaf, Zap, HelpCircle, X
+  Award, Droplets, Heart, Eye, ArrowUpRight
 } from 'lucide-react'
 import { useCart } from './CartContext'
 
@@ -28,9 +28,6 @@ export default function PremiumCategory() {
   // Quantities for each item (keyed by id)
   const [quantities, setQuantities] = useState({})
 
-  // Modal for deep formula inspection
-  const [activeFormulaModal, setActiveFormulaModal] = useState(null)
-
   const handleChange = (e) => {
     const { name, value } = e.target
     if (name === 'whatsapp_number') {
@@ -48,9 +45,11 @@ export default function PremiumCategory() {
     }))
   }
 
-  // --- Real Amway Personal Care Catalog with Genuine Web Images & Pro Seller Formulations ---
+  // --- Complete Amway Personal Care, Attitude Skincare & Beauty Catalog ---
   const products = [
-    // 1. Oral Care
+    // =========================================================================
+    // 1. ORAL CARE (GLISTER)
+    // =========================================================================
     {
       id: 'glister-classic',
       code: 'GLIS-200',
@@ -82,7 +81,7 @@ export default function PremiumCategory() {
       badge: 'Herbal Bio-Matrix',
       techBadge: 'Nutrilite Certified',
       headline: 'Clinically Proven Gum Defense for Irritated Hostel Stressed Teeth',
-      hype: 'Engineered with 11 certified herbal actives including Clove bud oil, Peppermint, Spearmint, and Ginger root. Calms inflamed gums, bleeding from hard mess food, and neutralizes acidic saliva without toxic triclosan.',
+      hype: 'Engineered with 11 certified herbal actives including Clove bud oil, Peppermint, Spearmint, and Ginger root. Calms inflamed gums, bleeding from hard mess food, and neutralizes acidic saliva without toxic chemical triclosan.',
       clinicalPointers: [
         '11 Active botanicals with pure Clove & Tea Tree',
         'Zero triclosan, zero sodium saccharin, zero parabens',
@@ -132,7 +131,301 @@ export default function PremiumCategory() {
       image: 'https://www.amway.com/medias/127705-en-US-690px-01?context=bWFzdGVyfGltYWdlc3w2NTAyMXxpbWFnZS9wbmd8c3lzLW1hc3Rlci9pbWFnZXMvaDBkL2gyNy85ODgyMjkzNzMxMzU4LzEyNzcwNS1lbi1VUy02OTBweC0wMXxmODFkMDM1MWZhZTRiOGRmNzRjNzJiM2NlZDI1OTFlOTQ0NmIyZDE4MjIwYmQ1MzVkNjk0YjY4ZjVmYTBkNTEx'
     },
 
-    // 2. Body & Bath
+    // =========================================================================
+    // 2. SKINCARE (ATTITUDE HERBALS)
+    // =========================================================================
+    {
+      id: 'attitude-be-bright-wash',
+      code: 'ATTD-WASH',
+      category: 'Skincare (Attitude)',
+      name: 'Attitude™ Be Bright Herbal Face Wash',
+      spec: 'Papaya & Lemon Bio-Enzymes • 100ml',
+      price: 340,
+      mrp: 390,
+      badge: 'Bestseller',
+      techBadge: 'Fruit Enzyme Complex',
+      headline: 'Melts Away Bike Dust & Campus Grease Without Stripping Your Skin Barrier',
+      hype: 'Formulated with organic Papaya enzymes and Lemon extract. Dissolves micro-pollutants and stubborn midday sebum without harsh drying surfactants that trigger rebound oiliness 30 minutes later.',
+      clinicalPointers: [
+        'Bio-enzymatic micro-exfoliation removes deep dead skin cells',
+        'Vitamin C bio-complex reverses dull tan from college commute',
+        'Soap-free gel formulation respects skin pH balance 5.5',
+        'Visible brightness boost after a single 30-second wash'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/640/xif0q/face-wash/o/a/1/100-attitude-be-bright-herbals-face-wash-herbal-radiant-face-original-imahgb3ymgwwhpg7.jpeg?q=90'
+    },
+    {
+      id: 'attitude-scrub-dtan',
+      code: 'ATTD-SCRB',
+      category: 'Skincare (Attitude)',
+      name: 'Attitude™ Be Bright Herbals Face Scrub & D-Tan',
+      spec: 'Crushed Walnut & Papaya Exfoliator • 100g',
+      price: 390,
+      mrp: 440,
+      badge: 'Detox Formula',
+      techBadge: 'Micro-Exfoliant',
+      headline: 'Instant Campus D-Tan That Unclogs Blackheads In 2 Minutes',
+      hype: 'Gently dislodges stubborn blackheads and baked-in sun tan from daily college walking. Spherical micro-beads of walnut shell polish rough skin texture without micro-tearing your delicate facial skin.',
+      clinicalPointers: [
+        'Natural crushed walnut shell micro-granules',
+        'Formulated with herbal skin-lightening Licorice & Papaya',
+        'Removes dead skin layers and clears blocked whiteheads',
+        'Use twice weekly for glassy, smooth campus skin'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/160/210/xif0q/scrub/b/v/y/100-0-face-scrub-for-d-tan-helps-in-skin-brightening-and-remove-original-imaheruwsr9faf9z.jpeg?q=90'
+    },
+    {
+      id: 'attitude-day-cream',
+      code: 'ATTD-SPF',
+      category: 'Skincare (Attitude)',
+      name: 'Attitude™ Be Bright Day Cream SPF 15',
+      spec: 'Matte Blue-Light & UV Shield • 50g',
+      price: 420,
+      mrp: 480,
+      badge: 'Screen Guard',
+      techBadge: 'Blue-Light Defense',
+      headline: 'The Only Day Cream Built For Late-Night Laptop Coders & Sunny Campus Walks',
+      hype: 'Engineered for students spending 10+ hours staring at screens. Combines broad-spectrum SPF 15 with HEV blue-light shielding antioxidants and Indian Gooseberry to prevent digital dullness and pigmentation.',
+      clinicalPointers: [
+        'Shields against laptop/monitor high-energy blue-light rays',
+        'Ultra-lightweight matte gel: Zero sweaty sheen in classroom heat',
+        'Indian Gooseberry bio-actives even out patchy dark marks',
+        'Non-comedogenic: Guaranteed zero clogged pores or whiteheads'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/fairness/q/r/d/50-attitude-be-bright-herbals-day-cream-cream-amway-original-imahg9zrhbhrbftx.jpeg?q=90'
+    },
+    {
+      id: 'attitude-night-cream',
+      code: 'ATTD-NGHT',
+      category: 'Skincare (Attitude)',
+      name: 'Attitude™ Be Bright Herbal Deep Night Cream',
+      spec: 'Nocturnal Cellular Repair Matrix • 50g',
+      price: 450,
+      mrp: 520,
+      badge: 'Cellular Recovery',
+      techBadge: 'Night Lotus Active',
+      headline: 'Wake Up Looking Rested Even After An All-Night Coding Session',
+      hype: 'While you sleep in your hostel room, this dense restorative cream accelerates cellular renewal using Indian Lotus and Licorice root. Wakes up tired, sleep-deprived skin and completely reverses pollution dullness by 7 AM.',
+      clinicalPointers: [
+        'Overnight bio-hydration that penetrates 10 cuticle layers deep',
+        'Fades acne scarring and dark spots caused by stress',
+        'Locks in moisture against dehydrating hostel fan/AC air',
+        'Non-greasy velvet finish that doesn’t stain your pillow'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/moisturizer-cream/x/f/z/50-attitude-be-bright-herbals-night-cream-soft-smooth-radiant-original-imahgb2c8rgtsdhd.jpeg?q=90'
+    },
+    {
+      id: 'attitude-sunscreen',
+      code: 'ATTD-SUN',
+      category: 'Skincare (Attitude)',
+      name: 'Attitude™ Sunscreen Cream SPF 30 PA+++',
+      spec: 'Broad Spectrum Dry-Touch Shield • 100g',
+      price: 460,
+      mrp: 530,
+      badge: 'Zero White Cast',
+      techBadge: 'PA+++ Max Defense',
+      headline: 'Sweat-Resistant Sun Armor That Won’t Turn You Into A Ghost',
+      hype: 'Most drugstore sunscreens leave a chalky white film and melt into stinging sweat during summer campus commutes. Attitude SPF 30 PA+++ is a dry-touch formulation that bonds to skin with pure herbal UV blockers and zero stickiness.',
+      clinicalPointers: [
+        'High-grade PA+++ rating blocks both aging UVA and burning UVB',
+        '100% transparent dry-touch finish on all Indian skin tones',
+        'Sweat and water-resistant for up to 80 minutes outdoors',
+        'Dermatologist tested: zero fungal acne or clogged pores'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/640/xif0q/sunscreen/r/j/v/100-dermatologically-tested-30-attitude-original-imahgbgecwjhfgkr.jpeg?q=90'
+    },
+    {
+      id: 'attitude-clear-activ',
+      code: 'ATTD-ACNE',
+      category: 'Skincare (Attitude)',
+      name: 'Attitude™ Clear Activ Pimple Control Face Wash',
+      spec: 'Salicylic Acid & Green Tea Active • 100ml',
+      price: 360,
+      mrp: 410,
+      badge: 'Acne Strike',
+      techBadge: '2% BHA Salicylic',
+      headline: 'Dries Out Red Hormonal & Mess-Food Breakouts In 48 Hours',
+      hype: 'Oily canteen food, dust, and exam stress create painful inflamed cystic breakouts. Clear Activ penetrates directly into deep sebum plugs with 2% Salicylic Acid and botanical Green Tea to kill acne bacteria at the root.',
+      clinicalPointers: [
+        'Clears active whiteheads, blackheads, and hormonal pimples',
+        'Regulates T-zone oil production for up to 8 hours',
+        'Green tea antioxidants calm redness and post-acne dark marks',
+        'Gentle enough for twice-daily cleansing without flaking'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/640/xif0q/face-wash/o/a/1/100-attitude-be-bright-herbals-face-wash-herbal-radiant-face-original-imahgb3ymgwwhpg7.jpeg?q=90'
+    },
+
+    // =========================================================================
+    // 3. BEAUTY & GLAM (ATTITUDE & ARTISTRY)
+    // =========================================================================
+    {
+      id: 'attitude-matte-lipstick',
+      code: 'ATTD-LIP',
+      category: 'Beauty & Glam',
+      name: 'Attitude™ Intense Matte Velvet Lipstick',
+      spec: 'Lead-Free Longstay Color • Almond Oil Infused',
+      price: 390,
+      mrp: 450,
+      badge: 'Lead-Free Pure',
+      techBadge: 'Velvet Matte Stay',
+      headline: 'Transfer-Resistant High-Fashion Shades That Don’t Dry Out Lips',
+      hype: 'Commercial lipsticks use cheap lead and petroleum waxes that turn lips dark and cracked over time. Attitude Lipsticks are formulated with pure sweet almond oil, Vitamin E, and clean minerals for an all-day comfortable featherlight matte.',
+      clinicalPointers: [
+        '100% Lead-free and dermatologically allergy tested',
+        'Enriched with sweet almond oil and Vitamin E for deep hydration',
+        'Lasts through canteen lunches and coffee runs without smudging',
+        'Rich high-pigment payoff in a single smooth swipe'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/lipstick/v/y/g/6-attitude-matte-lipstick-set-of-6-shades-for-confident-looks-original-imahfzegueuzdhym.jpeg?q=80'
+    },
+    {
+      id: 'attitude-kajal',
+      code: 'ATTD-KAJ',
+      category: 'Beauty & Glam',
+      name: 'Attitude™ Smudgeproof Kohl Kajal & Eye Definer',
+      spec: '24-Hour Carbon Black • Dermat Tested',
+      price: 240,
+      mrp: 280,
+      badge: '24H Smudgeproof',
+      techBadge: 'Almond Wax Matrix',
+      headline: 'Deep Carbon Black That Won’t Run Or Give You Raccoon Eyes',
+      hype: 'Engineered for long days in non-AC college classrooms. Glides on like silk with zero tugging, sets in 30 seconds into a waterproof matte jet-black line that stays put despite humidity and sweat.',
+      clinicalPointers: [
+        'Ophthalmologically tested and safe for contact lens wearers',
+        'Infused with pure almond oil and natural waxes for smooth glide',
+        'Intense, rich midnight black pigment in a retractable pencil',
+        'Waterproof, sweatproof, and smudgeproof for 24 hours'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/160/210/kz4gh3k0/kajal/8/c/o/12-professional-matte-finish-multi-use-pencil-kajal-eye-liner-original-imagb76teqxmubyf.jpeg?q=90'
+    },
+    {
+      id: 'attitude-compact',
+      code: 'ATTD-CPCT',
+      category: 'Beauty & Glam',
+      name: 'Attitude™ Perfect Matte Compact Powder SPF 15',
+      spec: 'Oil-Free Sheer Velvet Mirror Case • 9g',
+      price: 380,
+      mrp: 440,
+      badge: 'Oil Absorb',
+      techBadge: 'Micro-Spherical Velvet',
+      headline: 'Instant 10-Second Midday Mattifying Touch-Up For Classroom Glow',
+      hype: 'Eliminates T-zone shininess and sweat sheen instantly without looking cakey or chalky. Comes with a built-in luxury mirror and velvet puff for fast touch-ups before college fests or presentations.',
+      clinicalPointers: [
+        'Oil-free micronized powder absorbs sebum without clogging pores',
+        'Broad spectrum SPF 15 protects against midday classroom sun',
+        'Blends seamlessly into natural Indian skin tones',
+        'Lightweight mirror case fits right inside your sling bag'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/compact/y/h/p/9-perfect-matte-compact-powder-spf-15-attitude-original-imahgbgecwjhfgkr.jpeg?q=90'
+    },
+    {
+      id: 'artistry-mousse-cleanser',
+      code: 'ART-MOUSSE',
+      category: 'Beauty & Glam',
+      name: 'Artistry Skin Nutrition™ Hydrating Mousse Cleanser',
+      spec: 'Patented Nutrilite™ White Chia • 145ml Luxury',
+      price: 950,
+      mrp: 1100,
+      badge: 'Haute Luxury',
+      techBadge: 'Micro-Biome Balance',
+      headline: 'The Hollywood-Grade Cloud Cleanser Used By Top Beauty Influencers',
+      hype: 'This is Amway’s flagship prestige skincare innovation. Pumps out an ultra-dense, self-foaming cloud infused with Nutrilite™ certified White Chia Seed. Gently lifts microscopic PM 2.5 pollutants while preserving your natural skin microbiome.',
+      clinicalPointers: [
+        'Self-foaming cloud mousse: zero friction on delicate skin',
+        'Patented Nutrilite™ organic White Chia seed amino matrix',
+        'Clean Vegan certified, cruelty-free, zero parabens or phthalates',
+        'Leaves skin feeling baby-soft, deeply nourished and glowing'
+      ],
+      image: 'https://www.amway.com/medias/123793V-en-US-690px-01?context=bWFzdGVyfGltYWdlc3w0NjkyM3xpbWFnZS9wbmd8aW1hZ2VzL2hmZi9oMjUvOTM1NTI4NjgzOTMyNi5wbmd8NGM5YzFjZGI4OWE5N2JjNmJiZWJkMmU5ZGFiYzcxNzZiYWE3MTM2ZGZhMWIyMzU5NGEwMjA1YTdjZjEzY2Y4Yg'
+    },
+    {
+      id: 'artistry-day-lotion',
+      code: 'ART-LOTION',
+      category: 'Beauty & Glam',
+      name: 'Artistry Skin Nutrition™ Hydrating Day Lotion SPF 30',
+      spec: 'Prestige 24H Cellular Shield • 50ml Luxury Pump',
+      price: 1450,
+      mrp: 1650,
+      badge: 'Prestige Tier',
+      techBadge: 'Nutrilite Pomegranate',
+      headline: 'The Ultimate High-Performance Skincare Investment For Flawless Skin',
+      hype: 'A lightweight luxury fluid that delivers 24-hour weightless moisture with full SPF 30 defense. Infused with Nutrilite™ organic Pomegranate and White Chia seed to shield your face from UV, environmental free radicals, and digital blue light.',
+      clinicalPointers: [
+        'Broad spectrum SPF 30 with Nutrilite organic farm botanicals',
+        'Prevents premature aging, dark spots, and collagen breakdown',
+        'Silky fluid texture that doubles as an ultra-smooth makeup primer',
+        'Dermatologist & allergy tested clean luxury skincare formulation'
+      ],
+      image: 'https://www.amway.com/medias/123800-en-US-690px-01?context=bWFzdGVyfGltYWdlc3w0MzQ4N3xpbWFnZS9wbmd8aW1hZ2VzL2hkZS9oN2EvOTM1NTI3NzQ2NzY3OC5wbmd8ODk2MmMxODliMjM1YWExZTUzNDZjM2E4NDZiMjU0Njc2YmQxMmMxNzA2Y2MxNGFjOWVhODc2MmQ0MjQzMWM5Mg'
+    },
+
+    // =========================================================================
+    // 4. HAIR & SCALP (SATINIQUE & PERSONA)
+    // =========================================================================
+    {
+      id: 'satinique-2in1',
+      code: 'SATN-2IN1',
+      category: 'Hair & Scalp',
+      name: 'Satinique™ 2-in-1 Shampoo & Conditioner',
+      spec: 'Patented Enerjuve™ Complex • 250ml',
+      price: 450,
+      mrp: 510,
+      badge: 'Salon Engineering',
+      techBadge: 'Enerjuve™ Molecule',
+      headline: 'Restores Lustre In 60 Seconds For Guys Who Hate Multiple Bottles',
+      hype: 'Patented Enerjuve™ is a US-patented positively-charged lipid complex that automatically seeks out negatively-charged damaged hair cuticles caused by sun, dust, and hard borewell water, repairing hair from the core outward.',
+      clinicalPointers: [
+        'Enerjuve™ patented lipid-creatine-18-MEA restorative complex',
+        'Borage seed oil & Vitamin E restore dull dry strands',
+        'One-step wash and detangle — cut your shower time in half',
+        'Maintains clean volume without flattening hair roots'
+      ],
+      image: 'https://www.amway.com/medias/126455-en-US-690px-01?context=bWFzdGVyfGltYWdlc3wxMDAyMjR8aW1hZ2UvcG5nfHN5cy1tYXN0ZXIvaW1hZ2VzL2hkNS9oYzgvOTk3NDI0MzU5MDE3NC8xMjY0NTUtZW4tVVMtNjkwcHgtMDF8N2ZlZmQ2N2ZlMmVkNDA2YWYyOWU1YTdiZDNlZTYxODRmNmFmMDk5MmQ0ZjM5MGI4MjZkYzliZTk3Y2U0NmVlNA'
+    },
+    {
+      id: 'satinique-antihairfall',
+      code: 'SATN-FALL',
+      category: 'Hair & Scalp',
+      name: 'Satinique™ Scalp Anti-Hairfall Shampoo',
+      spec: 'Eclipta Alba & Ginseng Active • 250ml',
+      price: 480,
+      mrp: 540,
+      badge: 'Hard Water Armor',
+      techBadge: '1800 Strands Saved',
+      headline: 'The Secret Weapon Against Hard Water Hair Thinning On Campus',
+      hype: 'Hostel shower water is rich in heavy minerals that clog hair follicles, resulting in handfuls of fallen hair every morning. Satinique Anti-Hairfall uses Korean Ginseng and Mulberry leaf extract to clear micro-blockages and save up to 1,800 strands a month.',
+      clinicalPointers: [
+        'Saves up to 1,800 hair strands per month in clinical trials',
+        'Stimulates micro-capillary scalp blood circulation',
+        'Exfoliates mineral build-up from chlorinated shower water',
+        'Fortifies fragile roots against tension and towel breakage'
+      ],
+      image: 'https://www.amway.com/medias/126460-en-US-690px-01?context=bWFzdGVyfGltYWdlc3wxMTIzMTF8aW1hZ2UvcG5nfHN5cy1tYXN0ZXIvaW1hZ2VzL2g1MS9oMGYvOTk1ODg3OTQyODYzOC8xMjY0NjAtZW4tVVMtNjkwcHgtMDF8MTQyZjU3NjI4MmUyZTcwNDFiYzNhMjE1NzA3MTVhMjg5YmI1NDhkMDU0ZDFhN2E0NGM5NDk5MjQxODc0OTE5NQ'
+    },
+    {
+      id: 'persona-coconut-oil',
+      code: 'PERS-OIL',
+      category: 'Hair & Scalp',
+      name: 'Persona™ 100% Pure Virgin Coconut Oil',
+      spec: 'Cold Pressed Edible Grade • 500ml Jumbo',
+      price: 245,
+      mrp: 290,
+      badge: '100% Unadulterated',
+      techBadge: 'Cold-Pressed Purity',
+      headline: 'Zero Liquid Paraffin. Zero Chemicals. 100% Kerala Coconuts.',
+      hype: 'Check your current hair oil label: 90% of commercial "coconut oils" are actually Light Liquid Paraffin (mineral petroleum oil). Persona is 100% pure cold-pressed edible grade coconut oil that penetrates deeply into the hair cortex.',
+      clinicalPointers: [
+        '100% pure edible grade coconut oil — zero petroleum filler',
+        'Rich in medium-chain fatty acids (Lauric Acid)',
+        'Deep pre-shampoo hot-oil treatment for damaged rough hair',
+        'Also doubles as an organic face & beard skin moisturizer'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/hair-oil/q/b/y/500-persona-pure-coconut-oil-for-hair-skin-care-natural-original-imahzavpkmfaqpbb.jpeg?q=90'
+    },
+
+    // =========================================================================
+    // 5. BODY & BATH (PERSONA & G&H)
+    // =========================================================================
     {
       id: 'persona-coconut-soap',
       code: 'PERS-SOAP',
@@ -234,111 +527,9 @@ export default function PremiumCategory() {
       image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/talc/q/n/s/350-persona-talc-amway-original-imahy3d8jngf8yhe.jpeg?q=90'
     },
 
-    // 3. Hair & Scalp
-    {
-      id: 'satinique-2in1',
-      code: 'SATN-2IN1',
-      category: 'Hair & Scalp',
-      name: 'Satinique™ 2-in-1 Shampoo & Conditioner',
-      spec: 'Patented Enerjuve™ Complex • 250ml',
-      price: 450,
-      mrp: 510,
-      badge: 'Salon Engineering',
-      techBadge: 'Enerjuve™ Molecule',
-      headline: 'Restores Lustre In 60 Seconds For Guys Who Hate Multiple Bottles',
-      hype: 'Patented Enerjuve™ is a US-patented positively-charged lipid complex that automatically seeks out negatively-charged damaged hair cuticles caused by sun, dust, and hard borewell water, repairing hair from the core outward.',
-      clinicalPointers: [
-        'Enerjuve™ patented lipid-creatine-18-MEA restorative complex',
-        'Borage seed oil & Vitamin E restore dull dry strands',
-        'One-step wash and detangle — cut your shower time in half',
-        'Maintains clean volume without flattening hair roots'
-      ],
-      image: 'https://www.amway.com/medias/126455-en-US-690px-01?context=bWFzdGVyfGltYWdlc3wxMDAyMjR8aW1hZ2UvcG5nfHN5cy1tYXN0ZXIvaW1hZ2VzL2hkNS9oYzgvOTk3NDI0MzU5MDE3NC8xMjY0NTUtZW4tVVMtNjkwcHgtMDF8N2ZlZmQ2N2ZlMmVkNDA2YWYyOWU1YTdiZDNlZTYxODRmNmFmMDk5MmQ0ZjM5MGI4MjZkYzliZTk3Y2U0NmVlNA'
-    },
-    {
-      id: 'satinique-antihairfall',
-      code: 'SATN-FALL',
-      category: 'Hair & Scalp',
-      name: 'Satinique™ Scalp Anti-Hairfall Shampoo',
-      spec: 'Eclipta Alba & Ginseng Active • 250ml',
-      price: 480,
-      mrp: 540,
-      badge: 'Hard Water Armor',
-      techBadge: '1800 Strands Saved',
-      headline: 'The Secret Weapon Against Hard Water Hair Thinning On Campus',
-      hype: 'Hostel shower water is rich in heavy minerals that clog hair follicles, resulting in handfuls of fallen hair every morning. Satinique Anti-Hairfall uses Korean Ginseng and Mulberry leaf extract to clear micro-blockages and save up to 1,800 strands a month.',
-      clinicalPointers: [
-        'Saves up to 1,800 hair strands per month in clinical trials',
-        'Stimulates micro-capillary scalp blood circulation',
-        'Exfoliates mineral build-up from chlorinated shower water',
-        'Fortifies fragile roots against tension and towel breakage'
-      ],
-      image: 'https://www.amway.com/medias/126460-en-US-690px-01?context=bWFzdGVyfGltYWdlc3wxMTIzMTF8aW1hZ2UvcG5nfHN5cy1tYXN0ZXIvaW1hZ2VzL2g1MS9oMGYvOTk1ODg3OTQyODYzOC8xMjY0NjAtZW4tVVMtNjkwcHgtMDF8MTQyZjU3NjI4MmUyZTcwNDFiYzNhMjE1NzA3MTVhMjg5YmI1NDhkMDU0ZDFhN2E0NGM5NDk5MjQxODc0OTE5NQ'
-    },
-    {
-      id: 'persona-coconut-oil',
-      code: 'PERS-OIL',
-      category: 'Hair & Scalp',
-      name: 'Persona™ 100% Pure Virgin Coconut Oil',
-      spec: 'Cold Pressed Edible Grade • 500ml Jumbo',
-      price: 245,
-      mrp: 290,
-      badge: '100% Unadulterated',
-      techBadge: 'Cold-Pressed Purity',
-      headline: 'Zero Liquid Paraffin. Zero Chemicals. 100% Kerala Coconuts.',
-      hype: 'Check your current hair oil label: 90% of commercial "coconut oils" are actually Light Liquid Paraffin (mineral petroleum oil). Persona is 100% pure cold-pressed edible grade coconut oil that penetrates deeply into the hair cortex.',
-      clinicalPointers: [
-        '100% pure edible grade coconut oil — zero petroleum filler',
-        'Rich in medium-chain fatty acids (Lauric Acid)',
-        'Deep pre-shampoo hot-oil treatment for damaged rough hair',
-        'Also doubles as an organic face & beard skin moisturizer'
-      ],
-      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/hair-oil/q/b/y/500-persona-pure-coconut-oil-for-hair-skin-care-natural-original-imahzavpkmfaqpbb.jpeg?q=90'
-    },
-
-    // 4. Face & Skin
-    {
-      id: 'attitude-be-bright-wash',
-      code: 'ATTD-WASH',
-      category: 'Face & Skin',
-      name: 'Attitude™ Be Bright Herbal Face Wash',
-      spec: 'Papaya & Lemon Bio-Enzymes • 100ml',
-      price: 340,
-      mrp: 390,
-      badge: 'Anti-Pollution',
-      techBadge: 'Fruit Enzyme Complex',
-      headline: 'Melts Away Bike Dust & Campus Grease Without Stripping Your Skin Barrier',
-      hype: 'Formulated with organic Papaya enzymes and Lemon extract. Dissolves micro-pollutants and stubborn midday grease without harsh surfactants that trigger rebound oiliness 30 minutes later.',
-      clinicalPointers: [
-        'Bio-enzymatic micro-exfoliation removes deep dead skin cells',
-        'Vitamin C bio-complex reverses dull tan from college commute',
-        'Soap-free gel formulation respects skin pH balance 5.5',
-        'Visible brightness boost after a single 30-second wash'
-      ],
-      image: 'https://rukminim3.flixcart.com/image/480/640/xif0q/face-wash/o/a/1/100-attitude-be-bright-herbals-face-wash-herbal-radiant-face-original-imahgb3ymgwwhpg7.jpeg?q=90'
-    },
-    {
-      id: 'attitude-day-cream',
-      code: 'ATTD-SPF',
-      category: 'Face & Skin',
-      name: 'Attitude™ Be Bright Day Cream SPF 15',
-      spec: 'Matte Blue-Light & UV Shield • 50g',
-      price: 420,
-      mrp: 480,
-      badge: 'Digital Screen Defense',
-      techBadge: 'Blue-Light Guard',
-      headline: 'The Only Moisturizer Built For Late-Night Laptop Coders & Sunny Campus Walks',
-      hype: 'Engineered for engineering students spending 10+ hours staring at screens. Combines broad-spectrum SPF 15 with HEV blue-light shielding antioxidants and Indian Gooseberry to prevent digital pigmentation.',
-      clinicalPointers: [
-        'Shields against laptop/monitor high-energy blue-light rays',
-        'Ultra-lightweight matte gel: Zero sweaty sheen in classroom heat',
-        'Indian Gooseberry bio-actives even out patchy dark marks',
-        'Non-comedogenic: Guaranteed zero clogged pores or whiteheads'
-      ],
-      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/fairness/q/r/d/50-attitude-be-bright-herbals-day-cream-cream-amway-original-imahg9zrhbhrbftx.jpeg?q=90'
-    },
-
-    // 5. Men's Grooming
+    // =========================================================================
+    // 6. MEN'S GROOMING (DYNAMITE)
+    // =========================================================================
     {
       id: 'dynamite-facewash',
       code: 'DYNA-WASH',
@@ -381,7 +572,15 @@ export default function PremiumCategory() {
     }
   ]
 
-  const categories = ['All', 'Oral Care', 'Body & Bath', 'Hair & Scalp', 'Face & Skin', "Men's Grooming"]
+  const categories = [
+    'All', 
+    'Oral Care', 
+    'Skincare (Attitude)', 
+    'Beauty & Glam', 
+    'Hair & Scalp', 
+    'Body & Bath', 
+    "Men's Grooming"
+  ]
 
   // Filtered list
   const filteredProducts = useMemo(() => {
@@ -392,7 +591,8 @@ export default function PremiumCategory() {
         item.spec.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.hype.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.headline.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.code.toLowerCase().includes(searchQuery.toLowerCase())
+        item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchQuery.toLowerCase())
       return matchCat && matchQuery
     })
   }, [products, selectedCategory, searchQuery])
@@ -431,7 +631,7 @@ export default function PremiumCategory() {
       ? `\n\n👤 *Student:* ${formData.student_name} (Roll: ${formData.roll_number || 'Hosteler'})\n📱 *Contact:* +91 ${formData.whatsapp_number || 'N/A'}`
       : ''
     
-    const message = `Hi Anant! 👋\nI want to order / inquire about this Amway premium product on Print Studio:\n\n✨ *Product:* ${product.name} (${product.code})\n📦 *Quantity:* ${qty}\n💰 *Price:* ₹${product.price * qty} (₹${product.price} each)${studentInfo}\n\nCan you confirm direct hand-to-hand delivery on campus?`
+    const message = `Hi Anant! 👋\nI want to order / inquire about this Amway product on Print Studio:\n\n✨ *Product:* ${product.name} (${product.code})\n📦 *Quantity:* ${qty}\n💰 *Price:* ₹${product.price * qty} (₹${product.price} each)${studentInfo}\n\nCan you confirm direct hand-to-hand delivery on campus?`
     window.open(`https://wa.me/${ANANT_WHATSAPP}?text=${encodeURIComponent(message)}`, '_blank')
   }
 
@@ -443,7 +643,7 @@ export default function PremiumCategory() {
          ========================================================================= */}
       <div className="relative pt-16 pb-24 px-4 sm:px-8 border-b border-[#d4cebd]/10 overflow-hidden bg-gradient-to-b from-[#1a1917] via-[#201f1c] to-[#1a1917]">
         {/* Subtle Ambient Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#c25134]/10 blur-[130px] pointer-events-none rounded-full" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[380px] bg-[#c25134]/10 blur-[140px] pointer-events-none rounded-full" />
 
         <div className="max-w-6xl mx-auto relative z-10">
           
@@ -463,12 +663,12 @@ export default function PremiumCategory() {
               </div>
 
               <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-[1.05]">
-                Clinical Purity.<br />
-                <span className="italic font-light text-[#d4cebd]">Pure Bio-Concentrates.</span>
+                Clinical Formulations.<br />
+                <span className="italic font-light text-[#d4cebd]">Attitude & Pure Beauty.</span>
               </h1>
 
               <p className="text-[#a09c91] text-base sm:text-xl font-medium mt-6 leading-relaxed max-w-2xl font-serif">
-                Supermarket personal care is 85% water, cheap foaming fillers, and chemical chalk. Upgrade to clinical-grade active botanicals that outlast 3 commercial bottles and withstand hard campus water.
+                Supermarket skincare is 85% water, cheap foaming fillers, and chemical chalk. Upgrade to clinical-grade active botanicals, lead-free cosmetics, and Nutrilite-powered bio-concentrates that outlast commercial products by 3x.
               </p>
             </div>
 
@@ -487,10 +687,10 @@ export default function PremiumCategory() {
                 Sourced fresh from certified Amway facilities. No expired stock. Hand-delivered straight to your hostel wing.
               </p>
               <a 
-                href={`https://wa.me/${ANANT_WHATSAPP}?text=${encodeURIComponent("Hi Anant! 👋 I'm on Print Studio looking at the Amway personal care collection. Can you recommend products for my skin/hair?")}`}
+                href={`https://wa.me/${ANANT_WHATSAPP}?text=${encodeURIComponent("Hi Anant! 👋 I'm browsing the Amway personal care & Attitude beauty vault on Print Studio. Can you recommend products for my skin/hair?")}`}
                 target="_blank" 
                 rel="noreferrer"
-                className="inline-flex items-center justify-center gap-1.5 w-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md"
+                className="inline-flex items-center justify-center gap-1.5 w-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md font-mono"
               >
                 <MessageCircle className="w-4 h-4" /> Consult with Anant on WhatsApp
               </a>
@@ -504,7 +704,7 @@ export default function PremiumCategory() {
               <div>
                 <h4 className="text-sm font-bold text-white tracking-wide">3x Concentration Metric</h4>
                 <p className="text-xs text-[#a09c91] mt-1 leading-relaxed">
-                  One pea-sized dot of Glister or one pump of Satinique delivers the active bio-payload of half a commercial bottle.
+                  One pea-sized dot of Glister or one pump of Attitude Cleanser delivers the active bio-payload of half a commercial bottle.
                 </p>
               </div>
             </div>
@@ -512,9 +712,9 @@ export default function PremiumCategory() {
             <div className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
               <ShieldCheck className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-bold text-white tracking-wide">Hostel Borewell Armor</h4>
+                <h4 className="text-sm font-bold text-white tracking-wide">Hostel Water & Screen Armor</h4>
                 <p className="text-xs text-[#a09c91] mt-1 leading-relaxed">
-                  Engineered with lipid barriers that prevent chlorinated hard campus water from turning hair frizzy or skin ashy.
+                  Anti-hairfall ginseng complexes and HEV blue-light shielding day creams built for real engineering college life.
                 </p>
               </div>
             </div>
@@ -522,9 +722,9 @@ export default function PremiumCategory() {
             <div className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
               <Award className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-sm font-bold text-white tracking-wide">Clinical-Grade Traceability</h4>
+                <h4 className="text-sm font-bold text-white tracking-wide">Lead-Free Clean Beauty</h4>
                 <p className="text-xs text-[#a09c91] mt-1 leading-relaxed">
-                  Nutrilite™ organic certified botanicals with tamper-proof batch verification codes. Inspect before you accept.
+                  Attitude lipsticks, kajal, and compacts formulated with almond oil and mineral pigments. 100% certified clean beauty.
                 </p>
               </div>
             </div>
@@ -649,7 +849,7 @@ export default function PremiumCategory() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search Glister, Satinique, Charcoal..."
+                  placeholder="Search Attitude, Glister, Lipstick..."
                   className="w-full bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] border-none rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium focus:ring-2 focus:ring-[#c25134] outline-none"
                 />
               </div>
@@ -690,7 +890,7 @@ export default function PremiumCategory() {
                       {product.code}
                     </span>
 
-                    {/* Actual Product Image with Elegant Drop Shadow */}
+                    {/* Actual Product Image with Drop Shadow */}
                     <img 
                       src={product.image} 
                       alt={product.name} 
@@ -792,7 +992,7 @@ export default function PremiumCategory() {
           {filteredProducts.length === 0 && (
             <div className="bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-3xl p-14 text-center mt-6">
               <p className="text-xl font-bold font-serif text-[#1a1917]">No products matched your search keyword.</p>
-              <p className="text-sm text-[#5a5750] mt-1 font-serif italic">Try searching for "Glister", "Satinique", or "Charcoal".</p>
+              <p className="text-sm text-[#5a5750] mt-1 font-serif italic">Try searching for "Attitude", "Lipstick", "Glister", or "Kajal".</p>
               <button
                 onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
                 className="mt-5 bg-[#1a1917] text-[#d4cebd] font-bold py-2 px-6 rounded-xl text-xs font-mono uppercase tracking-wider"
