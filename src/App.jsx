@@ -4,6 +4,7 @@ import Storefront from './Storefront'
 import PrintPage from './PrintPage'
 import CalculatorsCategory from './CalculatorsCategory'
 import RegistersCategory from './RegistersCategory'
+import PremiumCategory from './PremiumCategory'
 import Cart from './Cart'
 import TrackOrder from './TrackOrder'
 import AdminDashboard from './AdminDashboard'
@@ -26,11 +27,14 @@ function Navbar() {
           </div>
           <span className="font-semibold text-lg tracking-tight">Print Studio</span>
         </Link>
-        <div className="flex items-center gap-4 sm:gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
+          <Link to="/premium" className="text-xs sm:text-sm font-bold text-[#d4cebd] hover:text-white transition-colors bg-white/10 hover:bg-white/15 px-2.5 py-1 rounded-lg border border-[#d4cebd]/20">
+            Premium Care
+          </Link>
           <Link to="/partner" className="text-xs sm:text-sm font-bold text-[#c25134] hover:text-white transition-colors bg-[#c25134]/15 px-2.5 py-1 rounded-lg border border-[#c25134]/30">
             Earn ₹ / Partner
           </Link>
-          <Link to="/about" className="text-xs sm:text-sm text-[#d4cebd] hover:text-white transition-colors font-medium hidden sm:inline">
+          <Link to="/about" className="text-xs sm:text-sm text-[#d4cebd] hover:text-white transition-colors font-medium hidden md:inline">
             About Us
           </Link>
           <Link to="/track" className="text-xs sm:text-sm text-[#d4cebd] hover:text-white transition-colors font-medium">
@@ -65,6 +69,7 @@ function App() {
               <Route path="/print" element={<PrintPage />} />
               <Route path="/calculators" element={<CalculatorsCategory />} />
               <Route path="/registers" element={<RegistersCategory />} />
+              <Route path="/premium" element={<PremiumCategory />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/track" element={<TrackOrder />} />
               <Route path="/admin" element={<AdminDashboard />} />
