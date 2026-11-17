@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { 
   User, FileText, Phone, ShoppingCart, ArrowLeft, CheckCircle2, 
-  Sparkles, MessageCircle, Search, ShieldCheck, Flame, Plus, Minus, ExternalLink 
+  Sparkles, MessageCircle, Search, ShieldCheck, Check, Plus, Minus,
+  ArrowUpRight, Award, Droplets, Leaf, Zap, HelpCircle, X
 } from 'lucide-react'
 import { useCart } from './CartContext'
 
@@ -27,6 +28,9 @@ export default function PremiumCategory() {
   // Quantities for each item (keyed by id)
   const [quantities, setQuantities] = useState({})
 
+  // Modal for deep formula inspection
+  const [activeFormulaModal, setActiveFormulaModal] = useState(null)
+
   const handleChange = (e) => {
     const { name, value } = e.target
     if (name === 'whatsapp_number') {
@@ -44,225 +48,336 @@ export default function PremiumCategory() {
     }))
   }
 
-  // --- Complete Amway Personal Care Catalog ---
+  // --- Real Amway Personal Care Catalog with Genuine Web Images & Pro Seller Formulations ---
   const products = [
     // 1. Oral Care
     {
       id: 'glister-classic',
+      code: 'GLIS-200',
       category: 'Oral Care',
-      name: 'Glister Multi-Action Toothpaste',
-      subtext: 'Enamel-Safe Reminact Polish Formula (200g)',
+      name: 'Glister™ Multi-Action Fluoride Toothpaste',
+      spec: 'Net Wt. 200g • Lasts 90+ Days',
       price: 320,
-      badge: 'Bestseller',
-      tag: 'Lasts 3 Months',
-      hype: 'Patented Reminact formula actively redeposits essential minerals into enamel. Fights plaque, polishes away tea/coffee stains gently, and provides 12-hour fresh breath.',
-      image: 'https://images.unsplash.com/photo-1559591937-e62fb330914c?auto=format&fit=crop&w=800'
+      mrp: 360,
+      badge: 'Gold Standard',
+      techBadge: 'Sylodent™ Silica',
+      headline: 'The Enamel Armor That Outlasts 3 Commercial Pastes',
+      hype: 'Commercial pastes use abrasive chalk (calcium carbonate) that strips your enamel microscopic layer by layer. Glister uses spherical Sylodent™ silica micro-beads that safely buff tea, coffee, and nicotine stains while Reminact™ redeposits essential minerals into teeth.',
+      clinicalPointers: [
+        'Non-abrasive Sylodent™ micro-polishing beads',
+        'Reminact™ patented enamel re-mineralization',
+        'Zero sugary chalk fillers — concentrated pea-sized usage',
+        'Certified 12-hour breath ionization'
+      ],
+      image: 'https://www.amway.com/medias/124106-en-US-690px-01?context=bWFzdGVyfGltYWdlc3w0MTQ3OXxpbWFnZS9wbmd8c3lzLW1hc3Rlci9pbWFnZXMvaGFlL2hjMC85NTE4MTY3MDMxODM4LzEyNDEwNi1lbi1VUy02OTBweC0wMXwzZjk1MTcxYjIxMTcyMDdmYTY4NTJkNjE0MmU4NzRmYzU5ZTk4MTQ1NTBjOWE3NmVjOTZlZGExNWM3YzcwNWZm'
     },
     {
       id: 'glister-herbals',
+      code: 'GLIS-HRB',
       category: 'Oral Care',
-      name: 'Glister Herbals Multi-Action Paste',
-      subtext: '11 Powerful Botanicals (190g)',
+      name: 'Glister™ Multi-Action Herbals Toothpaste',
+      spec: '11 Certified Botanicals • 190g',
       price: 335,
-      badge: 'Botanical',
-      tag: 'Gum Care',
-      hype: 'Infused with 11 certified herbal actives including Clove, Spearmint, Peppermint, and Ginger. Fortifies sensitive gums against hostel food irritation without harsh synthetic abrasives.',
-      image: 'https://images.unsplash.com/photo-1563178406-4cdc2923acbc?auto=format&fit=crop&w=800'
+      mrp: 375,
+      badge: 'Herbal Bio-Matrix',
+      techBadge: 'Nutrilite Certified',
+      headline: 'Clinically Proven Gum Defense for Irritated Hostel Stressed Teeth',
+      hype: 'Engineered with 11 certified herbal actives including Clove bud oil, Peppermint, Spearmint, and Ginger root. Calms inflamed gums, bleeding from hard mess food, and neutralizes acidic saliva without toxic triclosan.',
+      clinicalPointers: [
+        '11 Active botanicals with pure Clove & Tea Tree',
+        'Zero triclosan, zero sodium saccharin, zero parabens',
+        'Soothes bleeding gums within 72 hours of use',
+        'Refreshing non-medicinal natural clove-mint burst'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/toothpaste/d/j/o/-original-imah4hzyqhhz8u9h.jpeg?q=90'
     },
     {
       id: 'glister-spray',
+      code: 'GLIS-SPY',
       category: 'Oral Care',
-      name: 'Glister Mint Refresher Mouth Spray',
-      subtext: 'Instant Pocket Freshness (9g / 250+ Sprays)',
+      name: 'Glister™ Mint Refresher Mouth Spray',
+      spec: 'Pocket Pocket Aerosol • 250+ Sprays',
       price: 240,
-      badge: 'Campus Essential',
-      tag: 'Sugar-Free',
-      hype: 'Ultra-compact breath defense for post-canteen meals, viva presentations, and campus interviews. 250+ measured sprays of potent, long-lasting cooling spearmint.',
-      image: 'https://images.unsplash.com/photo-1608248597359-2e118cbbd377?auto=format&fit=crop&w=800'
+      mrp: 270,
+      badge: 'Executive EDC',
+      techBadge: 'Sugar-Free Ionizer',
+      headline: 'Instant Interview & Date Ready Breath In 2 Seconds',
+      hype: 'Forget chewing sugary gums that rot your teeth during campus presentations. One measured micro-mist delivers pure Nutrilite-farmed spearmint that kills 99.9% of oral anaerobic odor bacteria instantly.',
+      clinicalPointers: [
+        '250+ metered micro-doses in a sleek matte atomizer',
+        'Zero sugar, zero sticky residue, zero calories',
+        'Neutralizes canteen garlic, spicy food & tobacco odor',
+        'Fits discreetly inside your ID card lanyard or blazer pocket'
+      ],
+      image: 'https://www.amway.com/medias/124111-en-US-690px-01?context=bWFzdGVyfGltYWdlc3w0MTYxOHxpbWFnZS9wbmd8c3lzLW1hc3Rlci9pbWFnZXMvaGQyL2hhNC85NTE4MTY3ODgzODA2LzEyNDExMS1lbi1VUy02OTBweC0wMXw1YzM4NjU2YTRjNTVhOGIwNWMyM2I5NDI1YjQ2MjQ5ZGUyNTgxOGE3OTZlMDRmYjY4ZDM1YmJkOGVjOWY0NTRh'
     },
     {
       id: 'glister-brush',
+      code: 'GLIS-BR4',
       category: 'Oral Care',
-      name: 'Glister Advanced Multi-Action Toothbrush',
-      subtext: 'Pack of 4 Precision Brushes',
+      name: 'Glister™ Advanced Multi-Action Toothbrush',
+      spec: 'Pack of 4 Precision Brushes',
       price: 290,
-      badge: 'Value Pack',
-      tag: 'Soft Flexible Neck',
-      hype: 'Tapered bristles with 75% more filament count than standard market brushes. Ergonomic non-slip grip engineered to clean deep interdental gaps safely.',
-      image: 'https://images.unsplash.com/photo-1528740561666-dc2479dc08ab?auto=format&fit=crop&w=800'
+      mrp: 330,
+      badge: 'German Filament',
+      techBadge: '75% Denser Tufts',
+      headline: 'Flexible Neck Geometry That Protects Your Receding Gumline',
+      hype: 'Features 75% more tufts than supermarket plastic brushes. Patented angled flex-neck absorbs excess hand pressure, stopping gum recession while interdental tapered bristles clean where floss can’t reach.',
+      clinicalPointers: [
+        'End-rounded dual-height DuPont bristles',
+        'Shock-absorbing flex-neck prevents tooth wear',
+        'Ergonomic non-slip rubberized thumb grip',
+        'Includes 4 color-coded brushes for semester hygiene'
+      ],
+      image: 'https://www.amway.com/medias/127705-en-US-690px-01?context=bWFzdGVyfGltYWdlc3w2NTAyMXxpbWFnZS9wbmd8c3lzLW1hc3Rlci9pbWFnZXMvaDBkL2gyNy85ODgyMjkzNzMxMzU4LzEyNzcwNS1lbi1VUy02OTBweC0wMXxmODFkMDM1MWZhZTRiOGRmNzRjNzJiM2NlZDI1OTFlOTQ0NmIyZDE4MjIwYmQ1MzVkNjk0YjY4ZjVmYTBkNTEx'
     },
 
     // 2. Body & Bath
     {
       id: 'persona-coconut-soap',
+      code: 'PERS-SOAP',
       category: 'Body & Bath',
-      name: 'Persona Pure Coconut Nourishing Soap',
-      subtext: 'Pack of 3 Luxury Bars (75g each)',
+      name: 'Persona™ Pure Coconut Moisturizing Soap',
+      spec: 'Pack of 3 Luxury Bars (75g each)',
       price: 195,
-      badge: 'Daily Luxury',
-      tag: '100% Veg Oil',
-      hype: 'Triple-milled formula made from 100% pure coconut oil, sweet almond oil, and Vitamin E. Produces a dense, conditioning lather that prevents hostel hard water skin dryness.',
-      image: 'https://images.unsplash.com/photo-1607006314639-659f485f7a07?auto=format&fit=crop&w=800'
+      mrp: 230,
+      badge: 'Grade-1 TFM 76%',
+      techBadge: 'Triple-Milled Coconut',
+      headline: 'The Only Soap That Won’t Turn Ashy In Hostel Hard Water',
+      hype: 'Commercial soap bars are Grade-3 filler chalk with less than 60% TFM that dry your skin into white cracks. Persona is Grade-1 (76%+ Total Fatty Matter) made from 100% pure cold-pressed coconut oil, sweet almond oil, and pure Vitamin E.',
+      clinicalPointers: [
+        'Highest Grade-1 classification (TFM > 76%)',
+        'Enriched with sweet almond oil & pure Vitamin E',
+        'Triple-milled: Does not melt or turn into mush in hostel soap dishes',
+        'Lathers richly even in high-TDS chlorinated borewell water'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/soap/n/s/f/1-300-persona-cream-moisturizing-soap-75g-pack-of-3-with-vitamin-original-imahpqgaxpbgdzzd.jpeg?q=90'
     },
     {
       id: 'persona-germ-soap',
+      code: 'PERS-GERM',
       category: 'Body & Bath',
-      name: 'Persona Germ Protection Herbal Soap',
-      subtext: 'Pack of 3 Hygiene Bars (75g each)',
+      name: 'Persona™ Germ Protection Herbal Bath Bar',
+      spec: 'Pack of 3 Hygiene Bars (75g each)',
       price: 210,
-      badge: 'Hostel Defense',
-      tag: 'Triclocarban-Free',
-      hype: 'Eliminates 99.9% of campus gym and monsoon bacteria while keeping skin naturally hydrated with aloe vera and tea-tree essence.',
-      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800'
+      mrp: 245,
+      badge: 'Clinical Hygiene',
+      techBadge: 'Aloe + Tea Tree',
+      headline: '99.9% Gym & Monsoon Bacteria Elimination Without Chemical Burn',
+      hype: 'Most antibacterial soaps use harsh chemicals like triclocarban that destroy your skin’s natural microbiome. Persona uses medical-grade tea tree oil and aloe vera to eliminate ringworm, sweat odor, and fungal gym rashes gently.',
+      clinicalPointers: [
+        'Eliminates 99.9% of campus athletic & sweat microbes',
+        'Triclocarban-free natural antiseptic shield',
+        'Aloe vera infusion protects skin barrier from cracking',
+        'Recommended for hostelers who play sports or hit the gym'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/soap/j/e/a/4-200-persona-creme-moisturizing-soap-pack-of-4-amway-original-imahf7gnxphphnye.jpeg?q=80'
     },
     {
       id: 'gnh-body-wash',
+      code: 'GNH-WASH',
       category: 'Body & Bath',
-      name: 'G&H Refresh+ Clean Gel Body Wash',
-      subtext: 'Hydrating Botanical Formula (250ml)',
+      name: 'g&h™ Nourish Botanical Clean Body Wash',
+      spec: 'Sulfate-Free Concentrate • 250ml',
       price: 460,
-      badge: 'Ultra Concentrate',
-      tag: 'Sulfate-Free',
-      hype: 'Enriched with antioxidant grape seed extract and calming aloe vera. A single coin-sized drop lathers fully, washing off pollution and gym fatigue with zero soap scum.',
-      image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800'
+      mrp: 520,
+      badge: 'Vegan Certified',
+      techBadge: 'White Chia + Bamboo',
+      headline: 'A Coin-Sized Drop That Leaves Skin Feeling Like A 5-Star Spa',
+      hype: 'Formulated with Nutrilite™ white chia seed extract, olive oil-derived ceramides, and bamboo water. 100% biodegradable and sulfate-free. Leaves zero chemical film or stickiness on your skin.',
+      clinicalPointers: [
+        'Concentrated formula: 1 bottle lasts up to 75 full showers',
+        '100% Vegan Society certified with clean plant ceramides',
+        'Patented anti-irritation complex protects sensitive skin',
+        'Cruelty-free, sulfate-free, and dermatologically tested'
+      ],
+      image: 'https://www.amway.com/medias/125914-en-US-690px-01?context=bWFzdGVyfGltYWdlc3wxNTQ3OTh8aW1hZ2UvcG5nfHN5cy1tYXN0ZXIvaW1hZ2VzL2gxNC9oY2IvOTU3Mzc3MzA0OTg4Ni8xMjU5MTQtZW4tVVMtNjkwcHgtMDF8YWZiMGFiNTEwYTQ1ODk2OTYxNDFjZjcxNmQ2YzdkYTEzN2I4MTYxNGYyMTU0ZmYzMmFmYjQ1NzliOWM2ODBmMA'
     },
     {
       id: 'gnh-body-lotion',
+      code: 'GNH-LOTN',
       category: 'Body & Bath',
-      name: 'G&H Nourish+ Deep Moisture Lotion',
-      subtext: 'Orange Blossom Honey & Shea Butter (250ml)',
+      name: 'g&h™ Nourish 24-Hour Botanical Body Lotion',
+      spec: 'Bamboo Complex & Shea Butter • 250ml',
       price: 495,
-      badge: '24-Hr Barrier',
-      tag: 'Fast Absorbing',
-      hype: 'Clinically proven 24-hour hydration barrier. Non-greasy finish that instantly absorbs into wind-chapped skin, elbows, and knees during harsh campus winters.',
-      image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=800'
+      mrp: 560,
+      badge: 'Barrier Repair',
+      techBadge: 'Micro-Lipid Shield',
+      headline: 'Zero-Grease 24-Hour Skin Moisture That Absorbs In 10 Seconds',
+      hype: 'Infused with orange blossom honey, west African shea butter, and pumpkin seed oil. Unlike sticky paraffin drugstore lotions, this absorbs instantaneously without staining your college shirts or feeling clammy in class.',
+      clinicalPointers: [
+        'Proven 24-hour hydration barrier in clinical moisture tests',
+        'Instant matte-absorption — zero oiliness under clothing',
+        'Soothes winter scaling, chapped elbows & peeling skin',
+        'Hypoallergenic formulation safe for eczema-prone skin'
+      ],
+      image: 'https://www.amway.com/medias/125891-en-US-690px-01?context=bWFzdGVyfGltYWdlc3w3ODAwOXxpbWFnZS9wbmd8c3lzLW1hc3Rlci9pbWFnZXMvaDA1L2hlMi85NTY2MTA4NzEyOTkwLzEyNTg5MS1lbi1VUy02OTBweC0wMXwzMTJlOGMyMDc0MTMwZmRkMjUyYzQzY2UzZjZiOWZkOGZkZDNiMjM4MDllZjJlYmZjNTJkOGZhZTNlZWQ5MDdh'
     },
     {
       id: 'persona-talc',
+      code: 'PERS-TLC',
       category: 'Body & Bath',
-      name: 'Persona Deodorizing Talcum Powder',
-      subtext: 'Triple Action Sweat Protection (350g)',
+      name: 'Persona™ Deodorizing Cedarwood Talc',
+      spec: 'Anti-Sweat Micro-Fine • 350g Mega Pack',
       price: 220,
-      badge: 'Summer Shield',
-      tag: 'Cedarwood Essence',
-      hype: 'Micro-fine talc that absorbs heavy summer humidity and sweat odors. Infused with a crisp masculine-fresh cedarwood scent to stay confident all day in class.',
-      image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800'
+      mrp: 260,
+      badge: 'Campus Summer Shield',
+      techBadge: 'Micro-Fine Particle',
+      headline: 'Stops Shirt Sweat Stains & Friction Chafing In Non-AC Classrooms',
+      hype: 'Micro-pulverized talc particles create an invisible friction barrier on your neck, chest, and inner thighs. Features an active cooling deodorant matrix that activates whenever body temperature rises.',
+      clinicalPointers: [
+        'Absorbs 4x its weight in humidity and excess sweat',
+        'Subtle, masculine cedarwood aroma that lasts all day',
+        'Prevents collar staining and chafing during long lab hours',
+        'Dermatologically tested against heat rashes and prickly heat'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/talc/q/n/s/350-persona-talc-amway-original-imahy3d8jngf8yhe.jpeg?q=90'
     },
 
     // 3. Hair & Scalp
     {
       id: 'satinique-2in1',
+      code: 'SATN-2IN1',
       category: 'Hair & Scalp',
-      name: 'Satinique 2-in-1 Shampoo & Conditioner',
-      subtext: 'Enerjuve Patented Complex (250ml)',
+      name: 'Satinique™ 2-in-1 Shampoo & Conditioner',
+      spec: 'Patented Enerjuve™ Complex • 250ml',
       price: 450,
-      badge: 'Salon Grade',
-      tag: 'One-Step Care',
-      hype: 'Positively-charged Enerjuve lipo-protein complex targets damaged hair follicles. Nourishes, detangles, and smoothens frizzy hair in a single 60-second shower routine.',
-      image: 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=800'
+      mrp: 510,
+      badge: 'Salon Engineering',
+      techBadge: 'Enerjuve™ Molecule',
+      headline: 'Restores Lustre In 60 Seconds For Guys Who Hate Multiple Bottles',
+      hype: 'Patented Enerjuve™ is a US-patented positively-charged lipid complex that automatically seeks out negatively-charged damaged hair cuticles caused by sun, dust, and hard borewell water, repairing hair from the core outward.',
+      clinicalPointers: [
+        'Enerjuve™ patented lipid-creatine-18-MEA restorative complex',
+        'Borage seed oil & Vitamin E restore dull dry strands',
+        'One-step wash and detangle — cut your shower time in half',
+        'Maintains clean volume without flattening hair roots'
+      ],
+      image: 'https://www.amway.com/medias/126455-en-US-690px-01?context=bWFzdGVyfGltYWdlc3wxMDAyMjR8aW1hZ2UvcG5nfHN5cy1tYXN0ZXIvaW1hZ2VzL2hkNS9oYzgvOTk3NDI0MzU5MDE3NC8xMjY0NTUtZW4tVVMtNjkwcHgtMDF8N2ZlZmQ2N2ZlMmVkNDA2YWYyOWU1YTdiZDNlZTYxODRmNmFmMDk5MmQ0ZjM5MGI4MjZkYzliZTk3Y2U0NmVlNA'
     },
     {
       id: 'satinique-antihairfall',
+      code: 'SATN-FALL',
       category: 'Hair & Scalp',
-      name: 'Satinique Anti-Hairfall Botanical Shampoo',
-      subtext: 'Eclipta Alba & Ginseng Infusion (250ml)',
+      name: 'Satinique™ Scalp Anti-Hairfall Shampoo',
+      spec: 'Eclipta Alba & Ginseng Active • 250ml',
       price: 480,
-      badge: 'Hostel Water Armor',
-      tag: '1800 Strands Saved',
-      hype: 'Engineered specifically for stressed students battling hard water hair thinning. Reduces breakage by up to 1800 strands a month by stimulating micro-circulation at the root.',
-      image: 'https://images.unsplash.com/photo-1585751119414-ef2636f8aede?auto=format&fit=crop&w=800'
+      mrp: 540,
+      badge: 'Hard Water Armor',
+      techBadge: '1800 Strands Saved',
+      headline: 'The Secret Weapon Against Hard Water Hair Thinning On Campus',
+      hype: 'Hostel shower water is rich in heavy minerals that clog hair follicles, resulting in handfuls of fallen hair every morning. Satinique Anti-Hairfall uses Korean Ginseng and Mulberry leaf extract to clear micro-blockages and save up to 1,800 strands a month.',
+      clinicalPointers: [
+        'Saves up to 1,800 hair strands per month in clinical trials',
+        'Stimulates micro-capillary scalp blood circulation',
+        'Exfoliates mineral build-up from chlorinated shower water',
+        'Fortifies fragile roots against tension and towel breakage'
+      ],
+      image: 'https://www.amway.com/medias/126460-en-US-690px-01?context=bWFzdGVyfGltYWdlc3wxMTIzMTF8aW1hZ2UvcG5nfHN5cy1tYXN0ZXIvaW1hZ2VzL2g1MS9oMGYvOTk1ODg3OTQyODYzOC8xMjY0NjAtZW4tVVMtNjkwcHgtMDF8MTQyZjU3NjI4MmUyZTcwNDFiYzNhMjE1NzA3MTVhMjg5YmI1NDhkMDU0ZDFhN2E0NGM5NDk5MjQxODc0OTE5NQ'
     },
     {
       id: 'persona-coconut-oil',
+      code: 'PERS-OIL',
       category: 'Hair & Scalp',
-      name: 'Persona 100% Pure Virgin Coconut Oil',
-      subtext: 'Edible Grade Cold Pressed (500ml)',
+      name: 'Persona™ 100% Pure Virgin Coconut Oil',
+      spec: 'Cold Pressed Edible Grade • 500ml Jumbo',
       price: 245,
-      badge: '100% Pure',
-      tag: 'No Mineral Oil',
-      hype: 'Zero mineral oils, zero artificial preservatives. Deep-conditions damaged scalp cuticle layers and keeps hair thick and lustrous despite dust and pollution.',
-      image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800'
-    },
-    {
-      id: 'persona-amla-oil',
-      category: 'Hair & Scalp',
-      name: 'Persona Amla Herbal Scalp Oil',
-      subtext: 'Traditional Strengthener (200ml)',
-      price: 160,
-      badge: 'Campus Value',
-      tag: 'Ayurvedic Herb',
-      hype: 'Pure Indian Gooseberry (Amla) extract that conditions the scalp, cools down exam stress, and prevents premature graying caused by chlorinated hostel water.',
-      image: 'https://images.unsplash.com/photo-1608248597359-2e118cbbd377?auto=format&fit=crop&w=800'
+      mrp: 290,
+      badge: '100% Unadulterated',
+      techBadge: 'Cold-Pressed Purity',
+      headline: 'Zero Liquid Paraffin. Zero Chemicals. 100% Kerala Coconuts.',
+      hype: 'Check your current hair oil label: 90% of commercial "coconut oils" are actually Light Liquid Paraffin (mineral petroleum oil). Persona is 100% pure cold-pressed edible grade coconut oil that penetrates deeply into the hair cortex.',
+      clinicalPointers: [
+        '100% pure edible grade coconut oil — zero petroleum filler',
+        'Rich in medium-chain fatty acids (Lauric Acid)',
+        'Deep pre-shampoo hot-oil treatment for damaged rough hair',
+        'Also doubles as an organic face & beard skin moisturizer'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/hair-oil/q/b/y/500-persona-pure-coconut-oil-for-hair-skin-care-natural-original-imahzavpkmfaqpbb.jpeg?q=90'
     },
 
     // 4. Face & Skin
     {
       id: 'attitude-be-bright-wash',
+      code: 'ATTD-WASH',
       category: 'Face & Skin',
-      name: 'Attitude Be Bright Herbal Face Wash',
-      subtext: 'Papaya & Lemon Bio-Enzymes (100ml)',
+      name: 'Attitude™ Be Bright Herbal Face Wash',
+      spec: 'Papaya & Lemon Bio-Enzymes • 100ml',
       price: 340,
-      badge: 'Pollution Shield',
-      tag: 'Glow Restorer',
-      hype: 'Gently dissolves micro-dust and greasy sebum accumulated during daily commutes. Natural fruit enzymes illuminate dull campus skin without stripping natural skin moisture.',
-      image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800'
+      mrp: 390,
+      badge: 'Anti-Pollution',
+      techBadge: 'Fruit Enzyme Complex',
+      headline: 'Melts Away Bike Dust & Campus Grease Without Stripping Your Skin Barrier',
+      hype: 'Formulated with organic Papaya enzymes and Lemon extract. Dissolves micro-pollutants and stubborn midday grease without harsh surfactants that trigger rebound oiliness 30 minutes later.',
+      clinicalPointers: [
+        'Bio-enzymatic micro-exfoliation removes deep dead skin cells',
+        'Vitamin C bio-complex reverses dull tan from college commute',
+        'Soap-free gel formulation respects skin pH balance 5.5',
+        'Visible brightness boost after a single 30-second wash'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/640/xif0q/face-wash/o/a/1/100-attitude-be-bright-herbals-face-wash-herbal-radiant-face-original-imahgb3ymgwwhpg7.jpeg?q=90'
     },
     {
       id: 'attitude-day-cream',
+      code: 'ATTD-SPF',
       category: 'Face & Skin',
-      name: 'Attitude Be Bright Day Cream SPF 15',
-      subtext: 'Daily UV & Blue Light Guard (50g)',
+      name: 'Attitude™ Be Bright Day Cream SPF 15',
+      spec: 'Matte Blue-Light & UV Shield • 50g',
       price: 420,
-      badge: 'Matte Shield',
-      tag: 'Non-Greasy',
-      hype: 'Non-sticky daily hydration with SPF 15 and blue-light defense for late-night laptop sessions. Keeps skin even-toned, shielded from sun, and shine-free all day.',
-      image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800'
-    },
-    {
-      id: 'attitude-clear-activ',
-      category: 'Face & Skin',
-      name: 'Attitude Clear Activ Pimple Face Wash',
-      subtext: 'Salicylic Acid & Green Tea Active (100ml)',
-      price: 360,
-      badge: 'Acne Control',
-      tag: 'Dermatologist Tested',
-      hype: 'Clinically targeted for oily campus skin and stress breakouts. Unclogs deep pores, controls midday T-zone oil, and calms redness within 48 hours.',
-      image: 'https://images.unsplash.com/photo-1556228722-d0b7194680fb?auto=format&fit=crop&w=800'
+      mrp: 480,
+      badge: 'Digital Screen Defense',
+      techBadge: 'Blue-Light Guard',
+      headline: 'The Only Moisturizer Built For Late-Night Laptop Coders & Sunny Campus Walks',
+      hype: 'Engineered for engineering students spending 10+ hours staring at screens. Combines broad-spectrum SPF 15 with HEV blue-light shielding antioxidants and Indian Gooseberry to prevent digital pigmentation.',
+      clinicalPointers: [
+        'Shields against laptop/monitor high-energy blue-light rays',
+        'Ultra-lightweight matte gel: Zero sweaty sheen in classroom heat',
+        'Indian Gooseberry bio-actives even out patchy dark marks',
+        'Non-comedogenic: Guaranteed zero clogged pores or whiteheads'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/fairness/q/r/d/50-attitude-be-bright-herbals-day-cream-cream-amway-original-imahg9zrhbhrbftx.jpeg?q=90'
     },
 
     // 5. Men's Grooming
     {
       id: 'dynamite-facewash',
+      code: 'DYNA-WASH',
       category: "Men's Grooming",
-      name: 'Dynamite Men Brightening Face Wash',
-      subtext: 'Activated Charcoal & Vitamin B3 (100ml)',
+      name: 'Dynamite™ Foaming Face Wash For Men',
+      spec: 'Activated Charcoal & Vitamin B3 • 150ml Mega',
       price: 310,
-      badge: 'Heavy Duty',
-      tag: 'Zero Shine',
-      hype: 'Formulated for high-intensity engineering life. Activated micro-charcoal lifts tough grime, bike pollution, and excess grease instantly with an ice-cold cooling rush.',
-      image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800'
+      mrp: 360,
+      badge: 'Extreme Cleanse',
+      techBadge: 'Micro-Charcoal Sponge',
+      headline: 'Ice-Cold Charcoal Shock That Removes 8 Hours of Bike Smog & Sweat',
+      hype: 'Engineered specifically for thicker male skin exposed to open pollution and bike commutes. Activated bamboo charcoal micro-sponges absorb 200x their weight in stubborn oil, while cooling menthol resets your focus instantly.',
+      clinicalPointers: [
+        'Activated micro-charcoal lifts ground-in traffic soot & grime',
+        'Vitamin B3 (Niacinamide) prevents acne and dark spots',
+        'Cryo-menthol burst gives an instant 5-hour energy refresh',
+        '150ml extra-large pump bottle lasts the entire semester'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/640/xif0q/face-wash/m/i/l/150-dynamite-foaming-face-wash-amway-original-imahgmg8m4mctggp.jpeg?q=90'
     },
     {
       id: 'dynamite-shave-foam',
+      code: 'DYNA-SHAV',
       category: "Men's Grooming",
-      name: 'Dynamite Ultra-Glide Shaving Foam',
-      subtext: 'Dense Aloe-Vera Comfort Cushion (200g)',
+      name: 'Dynamite™ Ultra-Glide Shaving Foam',
+      spec: 'Aloe Vera Comfort Cushion • 200g',
       price: 280,
+      mrp: 320,
       badge: 'Zero Burn',
-      tag: 'Dense Foam',
-      hype: 'High-density rich micro-foam provides a friction-free razor glide. Shields sensitive skin from razor burn, ingrown hair, and hostel sink nicks.',
-      image: 'https://images.unsplash.com/photo-1512290900672-1f55b9a8960f?auto=format&fit=crop&w=800'
-    },
-    {
-      id: 'dynamite-styling-wax',
-      category: "Men's Grooming",
-      name: 'Dynamite Matte Hair Styling Wax',
-      subtext: 'High Hold & Flexible Matte Finish (75g)',
-      price: 350,
-      badge: 'All-Day Hold',
-      tag: 'Zero Flakes',
-      hype: 'Gives effortless volume and structure without grease or white dandruff-like flakes. Rinses out in a single wash with zero sticky residue.',
-      image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800'
+      techBadge: 'Micro-Cushion Foam',
+      headline: 'A Razor Glide So Smooth You Won’t Feel A Single Blade Pull',
+      hype: 'Commercial foams are mostly compressed air and drying alcohol that give you ingrown hairs and bleeding nicks before exams. Dynamite creates a dense, hydro-lipid cushion rich in aloe and chamomile that softens coarse beard hair.',
+      clinicalPointers: [
+        'Dense micro-bubble matrix creates a friction-free glide layer',
+        'Infused with pure Aloe Vera & Chamomile to stop razor burn',
+        'Hydrates skin underneath the beard to prevent flaky peeling',
+        'Leaves a clean, crisp masculine after-feel'
+      ],
+      image: 'https://rukminim3.flixcart.com/image/480/480/xif0q/shaving-cream/y/c/e/200-dynamite-shaving-foam-for-men-amway-original-imahfv97gnhphfhh.jpeg?q=90'
     }
   ]
 
@@ -274,8 +389,10 @@ export default function PremiumCategory() {
       const matchCat = selectedCategory === 'All' || item.category === selectedCategory
       const matchQuery = !searchQuery.trim() || 
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        item.subtext.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.hype.toLowerCase().includes(searchQuery.toLowerCase())
+        item.spec.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.hype.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.headline.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.code.toLowerCase().includes(searchQuery.toLowerCase())
       return matchCat && matchQuery
     })
   }, [products, selectedCategory, searchQuery])
@@ -297,13 +414,13 @@ export default function PremiumCategory() {
       roll_number: formData.roll_number,
       whatsapp_number: `+91${formData.whatsapp_number}`,
       item_type: 'Personal Care',
-      item_details: `${product.name} (${qty} qty)`,
+      item_details: `${product.name} [${product.code}] (${qty} qty)`,
       copies: qty,
       total_price: product.price * qty
     }
 
     addToCart(cartItem)
-    setSuccessMsg(`${qty} × ${product.name} added to your cart!`)
+    setSuccessMsg(`${qty} × ${product.name} added to your cart! Total: ₹${product.price * qty}`)
     setTimeout(() => setSuccessMsg(''), 4500)
   }
 
@@ -311,354 +428,409 @@ export default function PremiumCategory() {
   const handleWhatsAppInquiry = (product) => {
     const qty = quantities[product.id] || 1
     const studentInfo = formData.student_name 
-      ? `\n\n👤 *Student:* ${formData.student_name} (${formData.roll_number || 'Hosteler'})\n📱 *Contact:* +91 ${formData.whatsapp_number || 'N/A'}`
+      ? `\n\n👤 *Student:* ${formData.student_name} (Roll: ${formData.roll_number || 'Hosteler'})\n📱 *Contact:* +91 ${formData.whatsapp_number || 'N/A'}`
       : ''
     
-    const message = `Hi Anant! 👋\nI want to order / inquire about this Amway product from Print Studio:\n\n✨ *Product:* ${product.name}\n📦 *Quantity:* ${qty}\n💰 *Price:* ₹${product.price * qty} (₹${product.price} each)${studentInfo}\n\nCould you confirm campus hand-to-hand delivery?`
+    const message = `Hi Anant! 👋\nI want to order / inquire about this Amway premium product on Print Studio:\n\n✨ *Product:* ${product.name} (${product.code})\n📦 *Quantity:* ${qty}\n💰 *Price:* ₹${product.price * qty} (₹${product.price} each)${studentInfo}\n\nCan you confirm direct hand-to-hand delivery on campus?`
     window.open(`https://wa.me/${ANANT_WHATSAPP}?text=${encodeURIComponent(message)}`, '_blank')
   }
 
   return (
-    <div className="flex-1 w-full bg-[#d4cebd] text-[#1a1917] font-sans pb-32 pt-10">
-      <div className="max-w-6xl mx-auto px-4 sm:px-8">
-        
-        {/* Back Link */}
-        <Link to="/" className="inline-flex items-center gap-2 text-[#5a5750] hover:text-[#1a1917] font-bold mb-8 transition-colors">
-          <ArrowLeft className="w-5 h-5" /> Back to Storefront
-        </Link>
+    <div className="flex-1 w-full bg-[#1a1917] text-[#d4cebd] font-sans pb-32">
+      
+      {/* =========================================================================
+          HIGH-AESTHETIC EDITORIAL APOTHECARY HERO
+         ========================================================================= */}
+      <div className="relative pt-16 pb-24 px-4 sm:px-8 border-b border-[#d4cebd]/10 overflow-hidden bg-gradient-to-b from-[#1a1917] via-[#201f1c] to-[#1a1917]">
+        {/* Subtle Ambient Glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#c25134]/10 blur-[130px] pointer-events-none rounded-full" />
 
-        {/* =========================================================================
-            LUXURY MINIMALIST EDITORIAL HERO
-           ========================================================================= */}
-        <div className="bg-[#1a1917] text-[#d4cebd] rounded-3xl p-8 sm:p-14 shadow-2xl relative overflow-hidden border border-[#d4cebd]/15 mb-12">
+        <div className="max-w-6xl mx-auto relative z-10">
           
-          <div className="relative z-10 max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-[#c25134]/20 text-[#c25134] border border-[#c25134]/30 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-5">
-              <Sparkles className="w-3.5 h-3.5" /> Handpicked by Anant Thakkur • 100% Genuine Amway
+          <Link to="/" className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#a09c91] hover:text-white transition-colors mb-10">
+            <ArrowLeft className="w-3.5 h-3.5" /> Return to Campus Storefront
+          </Link>
+
+          <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8">
+            <div className="max-w-3xl">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="font-mono text-[11px] tracking-widest uppercase bg-[#c25134]/20 text-[#c25134] border border-[#c25134]/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+                  <Sparkles className="w-3 h-3" /> The Concierge Collection
+                </span>
+                <span className="font-mono text-[11px] tracking-widest uppercase text-[#a09c91]">
+                  [AMW-AUTHC-2026]
+                </span>
+              </div>
+
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black font-serif text-white tracking-tight leading-[1.05]">
+                Clinical Purity.<br />
+                <span className="italic font-light text-[#d4cebd]">Pure Bio-Concentrates.</span>
+              </h1>
+
+              <p className="text-[#a09c91] text-base sm:text-xl font-medium mt-6 leading-relaxed max-w-2xl font-serif">
+                Supermarket personal care is 85% water, cheap foaming fillers, and chemical chalk. Upgrade to clinical-grade active botanicals that outlast 3 commercial bottles and withstand hard campus water.
+              </p>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl font-black font-serif text-white tracking-tight leading-tight">
-              The Personal Care Vault.
-            </h1>
-
-            <p className="text-[#a09c91] text-base sm:text-xl font-medium mt-4 leading-relaxed font-serif italic">
-              Stop wasting money on watered-down market brands. Upgrade to clinical-grade, bio-concentrated daily essentials engineered to survive hostel water, dust, and daily wear.
-            </p>
-
-            {/* Direct Seller Contact Banner */}
-            <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-white/5 border border-white/10 p-4 sm:p-5 rounded-2xl">
-              <div className="w-10 h-10 rounded-full bg-[#c25134] text-white flex items-center justify-center font-bold shrink-0 shadow-md">
-                AT
+            {/* Direct Seller Guarantee Badge */}
+            <div className="bg-[#d4cebd]/5 border border-[#d4cebd]/15 p-6 rounded-2xl max-w-sm backdrop-blur-md">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-full bg-[#c25134] text-white flex items-center justify-center font-bold text-xs shadow-lg">
+                  AT
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white uppercase tracking-wider">Curated By Anant Thakkur</p>
+                  <p className="text-[11px] text-[#a09c91] font-mono">100% Genuine Direct Supply</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-white">Direct Hand-to-Hand Campus Delivery</p>
-                <p className="text-xs text-[#a09c91] mt-0.5">
-                  Supplied directly through Anant. Need a custom product, Nutrilite wellness supplement, or special campus bundle?
-                </p>
-              </div>
+              <p className="text-xs text-[#a09c91] leading-relaxed mb-4">
+                Sourced fresh from certified Amway facilities. No expired stock. Hand-delivered straight to your hostel wing.
+              </p>
               <a 
-                href={`https://wa.me/${ANANT_WHATSAPP}?text=${encodeURIComponent("Hi Anant! 👋 I'm browsing the Amway Personal Care vault on Print Studio and have a question...")}`}
+                href={`https://wa.me/${ANANT_WHATSAPP}?text=${encodeURIComponent("Hi Anant! 👋 I'm on Print Studio looking at the Amway personal care collection. Can you recommend products for my skin/hair?")}`}
                 target="_blank" 
                 rel="noreferrer"
-                className="bg-[#25D366] hover:bg-[#20ba59] text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-md shrink-0 whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-1.5 w-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md"
               >
-                <MessageCircle className="w-4 h-4" /> Chat With Me
+                <MessageCircle className="w-4 h-4" /> Consult with Anant on WhatsApp
               </a>
             </div>
           </div>
 
-          {/* Value Props Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10 pt-8 border-t border-white/10 text-xs">
-            <div className="flex items-start gap-3">
-              <span className="font-mono text-[#c25134] font-black text-lg">01</span>
+          {/* Minimalist 3-Pillar Scientific Strip */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 pt-10 border-t border-[#d4cebd]/10">
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <Droplets className="w-5 h-5 text-[#c25134] shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-white uppercase tracking-wider">Bio-Concentrated</p>
-                <p className="text-[#a09c91] mt-0.5">1 tube/bottle lasts 2x–3x longer than ordinary FMCG brands.</p>
+                <h4 className="text-sm font-bold text-white tracking-wide">3x Concentration Metric</h4>
+                <p className="text-xs text-[#a09c91] mt-1 leading-relaxed">
+                  One pea-sized dot of Glister or one pump of Satinique delivers the active bio-payload of half a commercial bottle.
+                </p>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <span className="font-mono text-[#c25134] font-black text-lg">02</span>
+
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <ShieldCheck className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-white uppercase tracking-wider">Hard Water Defense</p>
-                <p className="text-[#a09c91] mt-0.5">Specialized formulations that protect hair and skin from campus tap water.</p>
+                <h4 className="text-sm font-bold text-white tracking-wide">Hostel Borewell Armor</h4>
+                <p className="text-xs text-[#a09c91] mt-1 leading-relaxed">
+                  Engineered with lipid barriers that prevent chlorinated hard campus water from turning hair frizzy or skin ashy.
+                </p>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <span className="font-mono text-[#c25134] font-black text-lg">03</span>
+
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <Award className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-white uppercase tracking-wider">Zero Shipping Delay</p>
-                <p className="text-[#a09c91] mt-0.5">Hand-to-hand hostel delivery with zero shipping or handling fees.</p>
+                <h4 className="text-sm font-bold text-white tracking-wide">Clinical-Grade Traceability</h4>
+                <p className="text-xs text-[#a09c91] mt-1 leading-relaxed">
+                  Nutrilite™ organic certified botanicals with tamper-proof batch verification codes. Inspect before you accept.
+                </p>
               </div>
             </div>
           </div>
+
         </div>
-
-        {/* =========================================================================
-            STUDENT IDENTITY FORM (STANDARD DEBOSSED LETTERPRESS)
-           ========================================================================= */}
-        <div className="bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-3xl p-8 mb-10 border border-black/5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-black/10 pb-3 mb-6 gap-2">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#c25134]">Step 1</span>
-              <h2 className="text-2xl font-bold font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.1),_1px_1px_1px_rgba(255,255,255,0.8)]">
-                Verify Your Student Identity
-              </h2>
-            </div>
-            <span className="text-xs text-[#5a5750] font-medium">Required once before adding any items to cart</span>
-          </div>
-          
-          {errorMsg && (
-            <div className="mb-6 p-4 bg-[#c25134]/15 border border-[#c25134]/30 rounded-xl text-[#c25134] font-bold text-sm">
-              {errorMsg}
-            </div>
-          )}
-          {successMsg && (
-            <div className="mb-6 p-4 bg-green-900/10 border border-green-900/30 rounded-xl text-green-800 font-bold text-sm flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5"/> {successMsg}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-[#3a3832] uppercase tracking-wider">Student Name</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-4 w-4 text-[#1a1917]/50" />
-                </div>
-                <input 
-                  name="student_name" 
-                  value={formData.student_name} 
-                  onChange={handleChange} 
-                  className="w-full bg-[#d4cebd] border-none rounded-xl py-3 pl-10 pr-4 font-medium text-sm focus:ring-2 focus:ring-[#c25134] outline-none shadow-sm" 
-                  placeholder="Anant Thakkur" 
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-[#3a3832] uppercase tracking-wider">Roll Number</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FileText className="h-4 w-4 text-[#1a1917]/50" />
-                </div>
-                <input 
-                  name="roll_number" 
-                  value={formData.roll_number} 
-                  onChange={handleChange} 
-                  className="w-full bg-[#d4cebd] border-none rounded-xl py-3 pl-10 pr-4 font-medium text-sm focus:ring-2 focus:ring-[#c25134] outline-none shadow-sm uppercase" 
-                  placeholder="2023CS01" 
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-[#3a3832] uppercase tracking-wider">WhatsApp Number</label>
-              <div className="flex items-stretch bg-[#d4cebd] rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#c25134] shadow-sm">
-                <div className="flex items-center pl-3.5 pr-2.5 border-r border-black/10">
-                  <Phone className="h-4 w-4 text-[#1a1917]/50 mr-1.5" />
-                  <span className="text-[#1a1917] font-bold text-sm">+91</span>
-                </div>
-                <input 
-                  type="tel" 
-                  name="whatsapp_number" 
-                  value={formData.whatsapp_number} 
-                  onChange={handleChange} 
-                  pattern="[0-9]{10}" 
-                  maxLength="10" 
-                  className="w-full bg-transparent border-none py-3 px-3 font-medium text-sm focus:outline-none" 
-                  placeholder="9876543210" 
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* =========================================================================
-            CATEGORY TABS & SEARCH BAR
-           ========================================================================= */}
-        <div className="mb-10 space-y-4">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-            
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shadow-sm ${
-                    selectedCategory === cat
-                      ? 'bg-[#1a1917] text-[#d4cebd] shadow-md scale-105'
-                      : 'bg-[#cbc4b1] hover:bg-[#1a1917]/10 text-[#3a3832]'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            {/* Quick Search */}
-            <div className="relative min-w-[260px]">
-              <Search className="w-4 h-4 text-[#1a1917]/50 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Glister, Shampoo, Face Wash..."
-                className="w-full bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] border-none rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium focus:ring-2 focus:ring-[#c25134] outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between text-xs text-[#5a5750] px-1 font-medium">
-            <span>Showing {filteredProducts.length} premium essentials in "{selectedCategory}"</span>
-            <span>All items 100% sealed & delivered hand-to-hand</span>
-          </div>
-        </div>
-
-        {/* =========================================================================
-            PRODUCT CATALOG GRID
-           ========================================================================= */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map(product => {
-            const qty = quantities[product.id] || 1
-            const totalPrice = product.price * qty
-
-            return (
-              <div 
-                key={product.id}
-                className="bg-[#cbc4b1] rounded-3xl overflow-hidden shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] flex flex-col border border-black/5 transition-all hover:ring-2 ring-[#c25134]/30"
-              >
-                {/* Image & Badges */}
-                <div className="h-52 bg-[#1a1917] overflow-hidden relative border-b border-black/10">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover grayscale contrast-125 mix-blend-multiply opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-700" 
-                  />
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                    <span className="bg-[#1a1917]/90 text-[#d4cebd] text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-sm shadow">
-                      {product.badge}
-                    </span>
-                    <span className="bg-[#c25134] text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full shadow">
-                      {product.tag}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Details */}
-                <div className="p-6 flex flex-col flex-1">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#c25134]">
-                    {product.category}
-                  </span>
-                  
-                  <h3 className="text-xl font-bold font-serif text-[#1a1917] mt-1 [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.15),_1px_1px_1px_rgba(255,255,255,0.8)] leading-snug">
-                    {product.name}
-                  </h3>
-
-                  <p className="text-xs text-[#5a5750] font-semibold mt-0.5">
-                    {product.subtext}
-                  </p>
-
-                  <p className="text-xs text-[#3a3832] font-medium mt-3 leading-relaxed flex-1">
-                    {product.hype}
-                  </p>
-
-                  {/* Quantity & Price Row */}
-                  <div className="mt-6 pt-4 border-t border-black/10 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] text-[#5a5750] font-bold uppercase tracking-wider block">Total Price</span>
-                      <span className="text-2xl font-black text-[#c25134] font-serif">₹{totalPrice}</span>
-                      {qty > 1 && (
-                        <span className="text-[11px] text-[#5a5750] font-medium ml-1.5">(₹{product.price} each)</span>
-                      )}
-                    </div>
-
-                    {/* Quantity Selector */}
-                    <div className="flex items-center bg-[#d4cebd] rounded-xl p-1 shadow-inner border border-black/5">
-                      <button 
-                        type="button"
-                        onClick={() => handleQtyChange(product.id, -1)}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#cbc4b1] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] transition-all font-bold text-xs"
-                        title="Decrease Quantity"
-                      >
-                        <Minus className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="w-8 text-center font-bold text-xs text-[#1a1917]">{qty}</span>
-                      <button 
-                        type="button"
-                        onClick={() => handleQtyChange(product.id, 1)}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#cbc4b1] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] transition-all font-bold text-xs"
-                        title="Increase Quantity"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Dual Action Buttons: Add to Cart + WhatsApp */}
-                  <div className="mt-5 space-y-2">
-                    <button 
-                      onClick={() => handleAddToCart(product)}
-                      className="w-full bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg tracking-wide text-xs"
-                    >
-                      <ShoppingCart className="w-4 h-4" /> Add to Cart
-                    </button>
-
-                    <button 
-                      onClick={() => handleWhatsAppInquiry(product)}
-                      className="w-full bg-transparent hover:bg-black/5 border border-black/20 text-[#1a1917] font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-1.5 text-xs"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5 text-green-700" /> WhatsApp Anant (Instant)
-                    </button>
-                  </div>
-
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Empty State */}
-        {filteredProducts.length === 0 && (
-          <div className="bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-3xl p-12 text-center mt-6">
-            <p className="text-xl font-bold font-serif text-[#1a1917]">No products matched your search.</p>
-            <p className="text-sm text-[#5a5750] mt-1">Try another keyword or select "All Essentials".</p>
-            <button
-              onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
-              className="mt-4 bg-[#1a1917] text-[#d4cebd] font-bold py-2 px-5 rounded-xl text-xs"
-            >
-              Reset Filters
-            </button>
-          </div>
-        )}
-
-        {/* =========================================================================
-            BOTTOM CALLOUT: CUSTOM AMWAY ORDERS & NUTRILITE
-           ========================================================================= */}
-        <div className="mt-16 bg-[#1a1917] text-[#d4cebd] rounded-3xl p-8 sm:p-10 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6 border border-[#d4cebd]/10">
-          <div className="space-y-2 text-center sm:text-left">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#c25134]">
-              Custom Sourcing Request
-            </span>
-            <h3 className="text-2xl font-black font-serif text-white">
-              Want Nutrilite, Artistry, or an unlisted Amway item?
-            </h3>
-            <p className="text-sm text-[#a09c91] max-w-xl">
-              I can procure any item across Amway India's entire health, wellness, and beauty catalog with authentic batch codes and direct campus delivery.
-            </p>
-          </div>
-
-          <a 
-            href={`https://wa.me/${ANANT_WHATSAPP}?text=${encodeURIComponent("Hi Anant! 👋 I'm looking for a specific Amway product (Nutrilite/Artistry/other) that isn't listed on Print Studio. Can you source it for me?")}`}
-            target="_blank" 
-            rel="noreferrer"
-            className="bg-[#c25134] hover:bg-[#a6432a] text-[#d4cebd] font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm shrink-0 whitespace-nowrap"
-          >
-            <MessageCircle className="w-4 h-4" /> Request Custom Item
-          </a>
-        </div>
-
       </div>
+
+      {/* =========================================================================
+          MAIN STORE BODY (PAPER STOCK CANVAS FOR TACTILE LUXURY)
+         ========================================================================= */}
+      <div className="bg-[#d4cebd] text-[#1a1917] pt-12 pb-24">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8">
+          
+          {/* =========================================================================
+              STUDENT IDENTITY FORM (DEBOSSED EDITORIAL)
+             ========================================================================= */}
+          <div className="bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-3xl p-8 mb-12 border border-black/5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-black/10 pb-3 mb-6 gap-2">
+              <div>
+                <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#c25134]">[STEP 01]</span>
+                <h2 className="text-2xl font-bold font-serif text-[#1a1917] [text-shadow:-1px_-1px_1px_rgba(0,0,0,0.1),_1px_1px_1px_rgba(255,255,255,0.8)] mt-0.5">
+                  Verify Student Identification
+                </h2>
+              </div>
+              <span className="text-xs text-[#5a5750] font-mono">Locks in delivery coordinates for checkout</span>
+            </div>
+            
+            {errorMsg && (
+              <div className="mb-6 p-4 bg-[#c25134]/15 border border-[#c25134]/30 rounded-xl text-[#c25134] font-bold text-sm">
+                {errorMsg}
+              </div>
+            )}
+            {successMsg && (
+              <div className="mb-6 p-4 bg-green-900/10 border border-green-900/30 rounded-xl text-green-800 font-bold text-sm flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5"/> {successMsg}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-bold text-[#3a3832] uppercase tracking-wider">Student Name</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <User className="h-4 w-4 text-[#1a1917]/50" />
+                  </div>
+                  <input 
+                    name="student_name" 
+                    value={formData.student_name} 
+                    onChange={handleChange} 
+                    className="w-full bg-[#d4cebd] border-none rounded-xl py-3 pl-10 pr-4 font-medium text-sm focus:ring-2 focus:ring-[#c25134] outline-none shadow-sm" 
+                    placeholder="Anant Thakkur" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-bold text-[#3a3832] uppercase tracking-wider">Roll Number</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <FileText className="h-4 w-4 text-[#1a1917]/50" />
+                  </div>
+                  <input 
+                    name="roll_number" 
+                    value={formData.roll_number} 
+                    onChange={handleChange} 
+                    className="w-full bg-[#d4cebd] border-none rounded-xl py-3 pl-10 pr-4 font-medium text-sm focus:ring-2 focus:ring-[#c25134] outline-none shadow-sm uppercase font-mono" 
+                    placeholder="2023CS01" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-bold text-[#3a3832] uppercase tracking-wider">WhatsApp Number</label>
+                <div className="flex items-stretch bg-[#d4cebd] rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#c25134] shadow-sm">
+                  <div className="flex items-center pl-3.5 pr-2.5 border-r border-black/10">
+                    <Phone className="h-4 w-4 text-[#1a1917]/50 mr-1.5" />
+                    <span className="text-[#1a1917] font-bold text-sm font-mono">+91</span>
+                  </div>
+                  <input 
+                    type="tel" 
+                    name="whatsapp_number" 
+                    value={formData.whatsapp_number} 
+                    onChange={handleChange} 
+                    pattern="[0-9]{10}" 
+                    maxLength="10" 
+                    className="w-full bg-transparent border-none py-3 px-3 font-medium text-sm focus:outline-none font-mono" 
+                    placeholder="9876543210" 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* =========================================================================
+              MINIMALIST CATEGORY SELECTOR & SEARCH
+             ========================================================================= */}
+          <div className="mb-10 space-y-4">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+              
+              {/* Category Filter Pills */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider transition-all shadow-sm ${
+                      selectedCategory === cat
+                        ? 'bg-[#1a1917] text-[#d4cebd] shadow-md font-bold scale-[1.02]'
+                        : 'bg-[#cbc4b1] hover:bg-[#1a1917]/10 text-[#3a3832] font-semibold'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Instant Search Bar */}
+              <div className="relative min-w-[280px]">
+                <Search className="w-4 h-4 text-[#1a1917]/50 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search Glister, Satinique, Charcoal..."
+                  className="w-full bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] border-none rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium focus:ring-2 focus:ring-[#c25134] outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-[#5a5750] px-1 font-mono">
+              <span>Catalog Index: {filteredProducts.length} items in [{selectedCategory}]</span>
+              <span className="hidden sm:inline">Hand-to-Hand Delivery Across Campus</span>
+            </div>
+          </div>
+
+          {/* =========================================================================
+              EDITORIAL PRODUCT CARDS GRID
+             ========================================================================= */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredProducts.map(product => {
+              const qty = quantities[product.id] || 1
+              const totalPrice = product.price * qty
+
+              return (
+                <div 
+                  key={product.id}
+                  className="bg-[#dfd9cb] rounded-3xl overflow-hidden shadow-[inset_2px_2px_5px_rgba(255,255,255,0.6),_0_10px_25px_rgba(0,0,0,0.06)] flex flex-col border border-black/10 transition-all hover:shadow-[0_15px_35px_rgba(0,0,0,0.12)] hover:-translate-y-1 group"
+                >
+                  {/* Clean Studio Imagery Showcase */}
+                  <div className="h-64 bg-gradient-to-b from-[#ece7db] to-[#dfd9cb] flex items-center justify-center p-6 relative border-b border-black/5 overflow-hidden">
+                    {/* Top Badges */}
+                    <div className="absolute top-3.5 left-3.5 flex flex-wrap gap-1.5 z-10">
+                      <span className="bg-[#1a1917] text-[#d4cebd] text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-md shadow-sm">
+                        {product.badge}
+                      </span>
+                      <span className="bg-[#c25134] text-white text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-md shadow-sm">
+                        {product.techBadge}
+                      </span>
+                    </div>
+
+                    <span className="absolute top-3.5 right-3.5 text-[10px] font-mono text-[#1a1917]/40 uppercase tracking-widest">
+                      {product.code}
+                    </span>
+
+                    {/* Actual Product Image with Elegant Drop Shadow */}
+                    <img 
+                      src={product.image} 
+                      alt={product.name} 
+                      className="max-h-52 w-auto object-contain transition-all duration-500 group-hover:scale-105 drop-shadow-[0_10px_15px_rgba(0,0,0,0.15)] mix-blend-multiply" 
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* Card Content & Formulation Pitch */}
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-center justify-between text-[11px] font-mono text-[#5a5750]">
+                      <span className="uppercase tracking-widest text-[#c25134] font-bold">{product.category}</span>
+                      <span>{product.spec}</span>
+                    </div>
+
+                    <h3 className="text-xl font-bold font-serif text-[#1a1917] mt-1.5 leading-snug">
+                      {product.name}
+                    </h3>
+
+                    {/* Pro Seller Hook Headline */}
+                    <p className="text-xs font-serif italic font-bold text-[#c25134] mt-2 leading-tight">
+                      "{product.headline}"
+                    </p>
+
+                    <p className="text-xs text-[#3a3832] font-medium mt-3 leading-relaxed flex-1">
+                      {product.hype}
+                    </p>
+
+                    {/* Clinical Bullet Points */}
+                    <ul className="mt-4 pt-3 border-t border-black/5 space-y-1.5 text-[11px] text-[#5a5750]">
+                      {product.clinicalPointers.map((point, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-green-700 shrink-0 mt-0.5" />
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Price & Quantity Stepper */}
+                    <div className="mt-6 pt-4 border-t border-black/10 flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl font-black text-[#1a1917] font-serif">₹{totalPrice}</span>
+                          {product.mrp && (
+                            <span className="text-xs text-[#5a5750] line-through font-mono">₹{product.mrp * qty}</span>
+                          )}
+                        </div>
+                        {qty > 1 && (
+                          <span className="text-[10px] font-mono text-[#5a5750] block mt-0.5">(₹{product.price} each)</span>
+                        )}
+                      </div>
+
+                      {/* Quantity Stepper */}
+                      <div className="flex items-center bg-[#cbc4b1] rounded-xl p-1 shadow-inner border border-black/5">
+                        <button 
+                          type="button"
+                          onClick={() => handleQtyChange(product.id, -1)}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#d4cebd] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] transition-all font-bold text-xs"
+                          title="Decrease Quantity"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="w-8 text-center font-bold font-mono text-xs text-[#1a1917]">{qty}</span>
+                        <button 
+                          type="button"
+                          onClick={() => handleQtyChange(product.id, 1)}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#d4cebd] hover:bg-[#1a1917] hover:text-[#d4cebd] text-[#1a1917] transition-all font-bold text-xs"
+                          title="Increase Quantity"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Dual Action Buttons */}
+                    <div className="mt-5 space-y-2">
+                      <button 
+                        onClick={() => handleAddToCart(product)}
+                        className="w-full bg-[#1a1917] hover:bg-[#2a2927] text-[#d4cebd] font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md tracking-wide text-xs"
+                      >
+                        <ShoppingCart className="w-3.5 h-3.5" /> Add to Order Cart
+                      </button>
+
+                      <button 
+                        onClick={() => handleWhatsAppInquiry(product)}
+                        className="w-full bg-transparent hover:bg-black/5 border border-black/20 text-[#1a1917] font-bold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-1.5 text-xs font-mono"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5 text-green-700" /> WhatsApp Direct Order
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Empty State */}
+          {filteredProducts.length === 0 && (
+            <div className="bg-[#cbc4b1] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.1),_inset_-1px_-1px_2px_rgba(255,255,255,0.7)] rounded-3xl p-14 text-center mt-6">
+              <p className="text-xl font-bold font-serif text-[#1a1917]">No products matched your search keyword.</p>
+              <p className="text-sm text-[#5a5750] mt-1 font-serif italic">Try searching for "Glister", "Satinique", or "Charcoal".</p>
+              <button
+                onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
+                className="mt-5 bg-[#1a1917] text-[#d4cebd] font-bold py-2 px-6 rounded-xl text-xs font-mono uppercase tracking-wider"
+              >
+                Reset Catalog Filter
+              </button>
+            </div>
+          )}
+
+          {/* =========================================================================
+              CUSTOM AMWAY SOURCING CONCIERGE BANNER
+             ========================================================================= */}
+          <div className="mt-16 bg-[#1a1917] text-[#d4cebd] rounded-3xl p-8 sm:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10 relative overflow-hidden">
+            <div className="space-y-3 text-center md:text-left relative z-10 max-w-xl">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#c25134] bg-[#c25134]/15 px-3 py-1 rounded-full border border-[#c25134]/30 inline-block">
+                Custom Concierge Sourcing
+              </span>
+              <h3 className="text-3xl font-black font-serif text-white">
+                Looking for Nutrilite™, Artistry™, or SA8™?
+              </h3>
+              <p className="text-xs sm:text-sm text-[#a09c91] leading-relaxed">
+                As an authorized distributor on campus, I can procure any product across Amway India's entire health, nutrition, and home-care line. 100% genuine batch codes with zero shipping fees.
+              </p>
+            </div>
+
+            <a 
+              href={`https://wa.me/${ANANT_WHATSAPP}?text=${encodeURIComponent("Hi Anant! 👋 I'm looking for a specific Amway product (Nutrilite/Artistry/Home care) not listed on the Print Studio website. Can you source it for me?")}`}
+              target="_blank" 
+              rel="noreferrer"
+              className="bg-[#c25134] hover:bg-[#a6432a] text-white font-bold py-4 px-8 rounded-xl transition-all shadow-xl flex items-center justify-center gap-2 text-sm shrink-0 whitespace-nowrap font-mono tracking-wider relative z-10"
+            >
+              <MessageCircle className="w-4 h-4" /> Message Anant on WhatsApp
+            </a>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   )
 }
